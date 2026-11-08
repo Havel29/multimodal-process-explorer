@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ config.title }} {{ config.subtitle }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {% if config.logo %}<link rel="icon" href="/static/{{ config.logo }}">{% endif %}
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    :root {
+      {% for type in public_config.eventTypes %}--lane-{{ type.key }}: {{ type.color }};
+      {% endfor %}{% for model in config.models %}--model-{{ model.id }}: {{ model.color }};
+      {% endfor %}{% for outcome in config.outcome_classes %}--outcome-{{ outcome.code }}: {{ outcome.color }};
+      {% endfor %}--risk: var(--outcome-{{ config.risk_class }});
+    }
+  </style>
+  <script id="demo-config" type="application/json">{{ public_config | tojson }}</script>
+  <script type="module" src="/static/js/main.js"></script>
+</head>
+<body>
+  <main id="setupWizard" class="setup-wizard hidden" aria-labelledby="setupTitle">
+    <section class="setup-card">
+      <p id="setupStep" class="setup-step">Multimodal setup - Step 1 of 2</p>
+      <h1 id="setupTitle">{{ public_config.texts.setup_title }}</h1>
+      <p id="setupIntro">{{ public_config.texts.setup_intro }}</p>
+      <form id="setupPaths" autocomplete="off">
+        <label>XES event log<input id="xesFile" name="xes_file" type="file" accept=".xes,.gz,.xes.gz" required></label>
+        <label>Source image folder (matching XES paths)<input id="imageFiles" name="image_files" type="file" webkitdirectory directory multiple required></label>
+        <label>Model folder<input id="modelFiles" name="model_files" type="file" webkitdirectory directory multiple required></label>
+        <button class="primary-button" type="submit">Parse inputs</button>
+        <button id="setupContinue" class="secondary-button hidden" type="button">Continue with the data already loaded</button>
+      </form>
+      <form id="setupFields" class="hidden">
+        <p id="setupSummary" class="setup-summary"></p>
+        <div class="setup-grid">
+          <label>Case ID field<select id="caseField" required></select></label>
+          <label>Activity name field<select id="activityField" required></select></label>
+          <label>Timestamp field<select id="timestampField" required></select></label>
+          <label>Image field<select id="imageField" required></select></label>
+          <label>Label field (optional)<select id="labelField"></select></label>
+          <label data-role="text">Text model<select id="textModel"></select></label>
+          <label data-role="image">Image model<select id="imageModel"></select></label>
+          <label data-role="multimodal">Multimodal model<select id="multimodalModel"></select></label>
+        </div>
+        <div class="setup-actions">
+          <button id="setupBack" class="secondary-button" type="button">Back</button>
+          <button class="primary-button" type="submit">Apply setup</button>
+        </div>
+      </form>
+      <p id="setupMessage" class="setup-message" role="status"></p>
+    </section>
+  </main>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="{{ config.title }} home">
+      {% if config.logo %}<img src="/static/{{ config.logo }}" alt="" width="36" height="36">{% endif %}
+      <strong>{{ config.title }}</strong><span>{{ config.subtitle }}</span>
+    </a>
+    <nav class="patient-picker" aria-label="Case navigation">
+      <button id="previousPatient" type="button" aria-label="Previous case" title="Previous case">&#8249;</button>
+      <label><select id="patientSelect" aria-label="Select case"></select></label>
+      <button id="nextPatient" type="button" aria-label="Next case" title="Next case">&#8250;</button>
+    </nav>
+    <button id="statisticsTab" class="patient-tab statistics-tab{% if not config.labels_available %} hidden{% endif %}" type="button">{{ public_config.texts.statistics_title }}</button>
+    <div class="runtime-controls">
+      <button id="setupOpen" type="button">Inputs</button>
+      <label>Inference <select id="deviceSelect" aria-label="Inference device">
+        <option value="auto">Auto</option>
+        <option value="cpu">CPU</option>
+        <option value="gpu">GPU</option>
+      </select></label>
+      <button id="exportCsv" type="button" title="The predictions, prediction lines and explanation of this case, as a CSV file">Download CSV</button>
+    </div>
+    {% if config.institution %}<span class="institution">{{ config.institution }}</span>{% endif %}
+  </header>
+
+  <main id="patientView" class="workspace">
+    <section class="pathway">
+      <div class="patient-bar">
+        <div>
+          <h1 id="patientTitle">Loading</h1>
+          <p id="patientMeta"></p>
+          <div id="insights" class="insights"></div>
+        </div>
+        <div id="observedOutcome" class="observed{% if not config.labels_available %} hidden{% endif %}">{{ public_config.texts.observed_outcome }} <strong id="truthLabel"></strong></div>
+      </div>
+      <div id="swimlanes" class="swimlanes" aria-label="Case timeline"></div>
+      <p id="eventDetail" class="event-detail">{{ public_config.texts.timeline_help }}</p>
+    </section>
+
+    <section class="panels">
+      <div class="stage-image">
+        <div class="section-head">
+          <h2 id="stageTitle">No cutoff selected</h2>
+          <span id="stageTime"></span>
+        </div>
+        <div id="imageFrame" class="image-frame">
+          <img id="stageImage" class="hidden" alt="{{ config.image_noun | capitalize }} used by the image models">
+          <canvas id="heatmap" class="heatmap hidden" aria-hidden="true"></canvas>
+          <p id="imageEmpty">{{ public_config.texts.start_hint }}</p>
+        </div>
+        <label id="heatmapToggle" class="heatmap-toggle hidden"><input type="checkbox" checked> Show patch attributions</label>
+      </div>
+
+      <div class="knowledge">
+        <div class="section-head">
+          <h2>{{ public_config.texts.events_title }}</h2>
+          <span id="knowledgeCount"></span>
+        </div>
+        <div class="knowledge-actions">
+          <button id="enableAll" type="button">Select all</button>
+          <button id="disableAll" type="button">Clear</button>
+        </div>
+        <div id="knowledgeList" class="knowledge-list"></div>
+      </div>
+
+      <div class="predictions">
+        <div class="section-head">
+          <h2>{{ public_config.texts.predictions_title }}</h2>
+          <button id="predictButton" class="primary-button" type="button" disabled>Run again</button>
+        </div>
+        <div class="model-results">
+          {% for model in config.models %}
+          <div class="model-row" data-model="{{ model.id }}">
+            <div class="model-name"><strong><i class="swatch" style="background: var(--model-{{ model.id }})"></i>{{ model.name }}</strong><small>{{ model.description }}</small></div>
+            <div class="model-outcome"></div>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="legend">
+          {% for outcome in config.outcome_classes %}<i style="background: var(--outcome-{{ outcome.code }})"></i>{{ outcome.label }} {% endfor %}
+        </p>
+
+        <div class="analysis{% if not config.explanations %} hidden{% endif %}">
+          <div class="section-head"><h2>{{ public_config.texts.why_title }}</h2></div>
+          <div class="analysis-actions">
+            {% for explanation in config.explanations %}
+            <button class="explain-button" data-explain="{{ explanation.model }}" type="button" disabled>Explain {{ config.model(explanation.model).name }}</button>
+            {% endfor %}
+            <select id="explainScope" aria-label="What to explain">
+              <option value="context">{{ public_config.texts.scope_context }}</option>
+              <option value="history">{{ public_config.texts.scope_history }}</option>
+            </select>
+          </div>
+          <div id="analysisResult" class="analysis-result"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="statisticsView" class="statistics hidden">
+    <div class="statistics-head">
+      <div>
+        <h1>{{ public_config.texts.statistics_title }}</h1>
+        <p>{{ public_config.texts.statistics_intro }}</p>
+        <p id="statisticsCaveat" class="caveat"></p>
+      </div>
+      <button id="computeMissing" class="primary-button hidden" type="button">Compute missing cases</button>
+    </div>
+    <div id="statisticsCharts"></div>
+    <div id="statisticsTable" class="statistics-table"></div>
+  </main>
+
+  <footer>{{ config.disclaimer }}</footer>
+  <div id="toast" class="toast hidden" role="alert"></div>
+</body>
+</html>

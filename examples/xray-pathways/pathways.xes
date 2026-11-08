@@ -1,0 +1,1451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<log xes.version="1.0" xmlns="http://www.xes-standard.org/">
+  <extension name="Concept" prefix="concept" uri="http://www.xes-standard.org/concept.xesext"/>
+  <extension name="Time" prefix="time" uri="http://www.xes-standard.org/time.xesext"/>
+  <trace>
+    <string key="concept:name" value="P02501"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-27T04:00:00+00:00"/>
+      <int key="age_years" value="2"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="38.8"/>
+      <int key="oxygen_saturation" value="97"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-27T05:00:00+00:00"/>
+      <int key="crp_mg_l" value="56"/>
+      <float key="white_cells_10e9_l" value="13.1"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-27T10:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02501/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-02-28T12:00:00+00:00"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="98"/>
+      <int key="respiratory_rate" value="20"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-01T07:00:00+00:00"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="50"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T10:00:00+00:00"/>
+      <float key="temperature" value="38.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="51"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T14:00:00+00:00"/>
+      <float key="temperature" value="38.4"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="44"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T12:00:00+00:00"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="56"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02502"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-27T08:00:00+00:00"/>
+      <int key="age_years" value="2"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.4"/>
+      <int key="oxygen_saturation" value="95"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-27T09:00:00+00:00"/>
+      <int key="crp_mg_l" value="16"/>
+      <float key="white_cells_10e9_l" value="9.5"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-27T10:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02502/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-02-28T17:00:00+00:00"/>
+      <float key="temperature" value="37.2"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-01T16:00:00+00:00"/>
+      <string key="drug" value="amoxicillin"/>
+      <string key="route" value="oral"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T17:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="98"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T16:00:00+00:00"/>
+      <float key="temperature" value="36.5"/>
+      <int key="oxygen_saturation" value="99"/>
+      <int key="respiratory_rate" value="25"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T14:00:00+00:00"/>
+      <float key="temperature" value="36.2"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="26"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02503"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-27T12:00:00+00:00"/>
+      <int key="age_years" value="1"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="38.4"/>
+      <int key="oxygen_saturation" value="94"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-27T13:00:00+00:00"/>
+      <int key="crp_mg_l" value="103"/>
+      <float key="white_cells_10e9_l" value="18.6"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-27T14:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02503/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-02-28T22:00:00+00:00"/>
+      <float key="temperature" value="38.3"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="27"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-01T16:00:00+00:00"/>
+      <int key="oxygen_saturation" value="85"/>
+      <int key="respiratory_rate" value="60"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T21:00:00+00:00"/>
+      <float key="temperature" value="39.0"/>
+      <int key="oxygen_saturation" value="89"/>
+      <int key="respiratory_rate" value="42"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T21:00:00+00:00"/>
+      <float key="temperature" value="38.5"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="53"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T00:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02503/xray2.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02504"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-27T16:00:00+00:00"/>
+      <int key="age_years" value="4"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever, cough and poor feeding"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.0"/>
+      <int key="oxygen_saturation" value="90"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-27T17:00:00+00:00"/>
+      <int key="crp_mg_l" value="42"/>
+      <float key="white_cells_10e9_l" value="15.2"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-02-27T19:00:00+00:00"/>
+      <int key="flow_l_min" value="3"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-27T21:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02504/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-02-28T11:00:00+00:00"/>
+      <string key="drug" value="ceftriaxone"/>
+      <string key="route" value="intravenous"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-02-28T22:00:00+00:00"/>
+      <float key="temperature" value="38.1"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="29"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T23:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="33"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T23:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T23:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="92"/>
+      <int key="respiratory_rate" value="41"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T01:00:00+00:00"/>
+      <float key="temperature" value="36.2"/>
+      <int key="oxygen_saturation" value="92"/>
+      <int key="respiratory_rate" value="36"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T23:00:00+00:00"/>
+      <float key="temperature" value="36.2"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="36"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-06T08:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02504/xray2.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02505"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-27T20:00:00+00:00"/>
+      <int key="age_years" value="2"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="94"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-27T21:00:00+00:00"/>
+      <int key="crp_mg_l" value="55"/>
+      <float key="white_cells_10e9_l" value="7.9"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T02:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02505/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T02:00:00+00:00"/>
+      <float key="temperature" value="38.7"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-01T22:00:00+00:00"/>
+      <string key="drug" value="ceftriaxone"/>
+      <string key="route" value="intravenous"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-02T01:00:00+00:00"/>
+      <int key="oxygen_saturation" value="86"/>
+      <int key="respiratory_rate" value="58"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T02:00:00+00:00"/>
+      <float key="temperature" value="38.3"/>
+      <int key="oxygen_saturation" value="88"/>
+      <int key="respiratory_rate" value="49"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T02:00:00+00:00"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="46"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02506"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T00:00:00+00:00"/>
+      <int key="age_years" value="2"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="wheezing and cough"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="38.1"/>
+      <int key="oxygen_saturation" value="98"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T01:00:00+00:00"/>
+      <int key="crp_mg_l" value="33"/>
+      <float key="white_cells_10e9_l" value="7.1"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T05:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02506/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T08:00:00+00:00"/>
+      <float key="temperature" value="38.1"/>
+      <int key="oxygen_saturation" value="99"/>
+      <int key="respiratory_rate" value="31"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-02T02:00:00+00:00"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="48"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T09:00:00+00:00"/>
+      <float key="temperature" value="38.2"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="42"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T09:00:00+00:00"/>
+      <float key="temperature" value="38.3"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="47"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T08:00:00+00:00"/>
+      <float key="temperature" value="38.5"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="55"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T10:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02507"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T04:00:00+00:00"/>
+      <int key="age_years" value="4"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="cough and difficulty breathing"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.3"/>
+      <int key="oxygen_saturation" value="91"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T05:00:00+00:00"/>
+      <int key="crp_mg_l" value="44"/>
+      <float key="white_cells_10e9_l" value="14.9"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-02-28T06:00:00+00:00"/>
+      <int key="flow_l_min" value="3"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T08:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02507/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T13:00:00+00:00"/>
+      <float key="temperature" value="37.9"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T14:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-02T18:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02507/xray2.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T11:00:00+00:00"/>
+      <float key="temperature" value="37.2"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="33"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T10:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="34"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02508"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T08:00:00+00:00"/>
+      <int key="age_years" value="3"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.9"/>
+      <int key="oxygen_saturation" value="93"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T09:00:00+00:00"/>
+      <int key="crp_mg_l" value="23"/>
+      <float key="white_cells_10e9_l" value="11.0"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T12:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02508/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T16:00:00+00:00"/>
+      <float key="temperature" value="37.1"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="36"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T15:00:00+00:00"/>
+      <float key="temperature" value="37.5"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="33"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T18:00:00+00:00"/>
+      <float key="temperature" value="36.6"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="29"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T16:00:00+00:00"/>
+      <float key="temperature" value="36.4"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02509"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T12:00:00+00:00"/>
+      <int key="age_years" value="5"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="39.6"/>
+      <int key="oxygen_saturation" value="89"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T13:00:00+00:00"/>
+      <int key="crp_mg_l" value="102"/>
+      <float key="white_cells_10e9_l" value="5.0"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T14:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02509/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-02-28T16:00:00+00:00"/>
+      <int key="flow_l_min" value="3"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-02-28T18:00:00+00:00"/>
+      <string key="drug" value="ampicillin"/>
+      <string key="route" value="intravenous"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-01T21:00:00+00:00"/>
+      <float key="temperature" value="39.4"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T20:00:00+00:00"/>
+      <float key="temperature" value="38.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T22:00:00+00:00"/>
+      <float key="temperature" value="39.0"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="38"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T21:00:00+00:00"/>
+      <float key="temperature" value="38.7"/>
+      <int key="oxygen_saturation" value="90"/>
+      <int key="respiratory_rate" value="37"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T21:00:00+00:00"/>
+      <float key="temperature" value="38.1"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="38"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02510"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T16:00:00+00:00"/>
+      <int key="age_years" value="5"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever, cough and poor feeding"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="38.5"/>
+      <int key="oxygen_saturation" value="94"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T17:00:00+00:00"/>
+      <int key="crp_mg_l" value="95"/>
+      <float key="white_cells_10e9_l" value="14.1"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-02-28T21:00:00+00:00"/>
+      <string key="drug" value="amoxicillin"/>
+      <string key="route" value="oral"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-02-28T22:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02510/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T00:00:00+00:00"/>
+      <float key="temperature" value="38.4"/>
+      <int key="oxygen_saturation" value="92"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T01:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T23:00:00+00:00"/>
+      <float key="temperature" value="38.1"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="24"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02511"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-02-28T20:00:00+00:00"/>
+      <int key="age_years" value="3"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="90"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-02-28T21:00:00+00:00"/>
+      <int key="crp_mg_l" value="36"/>
+      <float key="white_cells_10e9_l" value="5.1"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-02-28T22:00:00+00:00"/>
+      <int key="flow_l_min" value="2"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-01T01:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02511/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T03:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="40"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T02:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T05:00:00+00:00"/>
+      <float key="temperature" value="36.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="41"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T05:00:00+00:00"/>
+      <float key="temperature" value="36.8"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="42"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02512"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-01T00:00:00+00:00"/>
+      <int key="age_years" value="1"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="cough and difficulty breathing"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="93"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-01T01:00:00+00:00"/>
+      <int key="crp_mg_l" value="43"/>
+      <float key="white_cells_10e9_l" value="10.6"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-01T02:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02512/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T08:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="38"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T10:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="36"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T08:00:00+00:00"/>
+      <float key="temperature" value="37.1"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="24"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T06:00:00+00:00"/>
+      <float key="temperature" value="36.2"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T08:00:00+00:00"/>
+      <float key="temperature" value="36.6"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="42"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T09:00:00+00:00"/>
+      <float key="temperature" value="36.2"/>
+      <int key="oxygen_saturation" value="99"/>
+      <int key="respiratory_rate" value="31"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02513"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-01T04:00:00+00:00"/>
+      <int key="age_years" value="1"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="cough and fever"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="93"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-01T05:00:00+00:00"/>
+      <int key="crp_mg_l" value="102"/>
+      <float key="white_cells_10e9_l" value="14.6"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-01T07:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02513/xray1.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-01T10:00:00+00:00"/>
+      <string key="drug" value="ampicillin"/>
+      <string key="route" value="oral"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-02T11:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="37"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-03T13:00:00+00:00"/>
+      <float key="temperature" value="36.9"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="29"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T15:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02513/xray2.jpg"/>
+      <string key="outcome" value="home"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T14:00:00+00:00"/>
+      <float key="temperature" value="36.3"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="28"/>
+      <string key="outcome" value="home"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02523"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-02T20:00:00+00:00"/>
+      <int key="age_years" value="4"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.0"/>
+      <int key="oxygen_saturation" value="91"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-02T21:00:00+00:00"/>
+      <int key="crp_mg_l" value="56"/>
+      <float key="white_cells_10e9_l" value="14.7"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-03-02T22:00:00+00:00"/>
+      <int key="flow_l_min" value="2"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T00:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02523/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T04:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="43"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T03:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <int key="respiratory_rate" value="41"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T03:00:00+00:00"/>
+      <float key="temperature" value="36.7"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="28"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-06T07:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02523/xray2.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02526"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-03T08:00:00+00:00"/>
+      <int key="age_years" value="5"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="92"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-03T09:00:00+00:00"/>
+      <int key="crp_mg_l" value="17"/>
+      <float key="white_cells_10e9_l" value="15.5"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T10:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02526/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T16:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="40"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T16:00:00+00:00"/>
+      <float key="temperature" value="37.9"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="38"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T18:00:00+00:00"/>
+      <float key="temperature" value="37.4"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="33"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T14:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="36"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02527"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-03T12:00:00+00:00"/>
+      <int key="age_years" value="3"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="92"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-03T13:00:00+00:00"/>
+      <int key="crp_mg_l" value="115"/>
+      <float key="white_cells_10e9_l" value="17.5"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T18:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02527/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T22:00:00+00:00"/>
+      <float key="temperature" value="38.6"/>
+      <int key="oxygen_saturation" value="92"/>
+      <int key="respiratory_rate" value="34"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T18:00:00+00:00"/>
+      <float key="temperature" value="38.0"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="34"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T21:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="37"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T22:00:00+00:00"/>
+      <float key="temperature" value="37.9"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-08T03:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02527/xray2.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-08T18:00:00+00:00"/>
+      <float key="temperature" value="36.5"/>
+      <int key="oxygen_saturation" value="98"/>
+      <int key="respiratory_rate" value="35"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-09T20:00:00+00:00"/>
+      <float key="temperature" value="37.7"/>
+      <int key="oxygen_saturation" value="98"/>
+      <int key="respiratory_rate" value="40"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02528"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-03T16:00:00+00:00"/>
+      <int key="age_years" value="3"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever and fast breathing"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.7"/>
+      <int key="oxygen_saturation" value="93"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-03T17:00:00+00:00"/>
+      <int key="crp_mg_l" value="33"/>
+      <float key="white_cells_10e9_l" value="11.7"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-03T22:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02528/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-04T22:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-05T17:00:00+00:00"/>
+      <string key="drug" value="amoxicillin"/>
+      <string key="route" value="oral"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T02:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="37"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T02:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="25"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-07T18:00:00+00:00"/>
+      <int key="oxygen_saturation" value="85"/>
+      <int key="respiratory_rate" value="52"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-08T01:00:00+00:00"/>
+      <float key="temperature" value="36.9"/>
+      <int key="oxygen_saturation" value="87"/>
+      <int key="respiratory_rate" value="39"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-09T00:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="87"/>
+      <int key="respiratory_rate" value="47"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-10T00:00:00+00:00"/>
+      <float key="temperature" value="36.6"/>
+      <int key="oxygen_saturation" value="85"/>
+      <int key="respiratory_rate" value="48"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02529"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-03T20:00:00+00:00"/>
+      <int key="age_years" value="5"/>
+      <string key="sex" value="female"/>
+      <string key="symptoms" value="cough and difficulty breathing"/>
+      <string key="triage" value="urgent"/>
+      <float key="temperature" value="38.8"/>
+      <int key="oxygen_saturation" value="91"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-03T21:00:00+00:00"/>
+      <int key="crp_mg_l" value="25"/>
+      <float key="white_cells_10e9_l" value="14.4"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Oxygen therapy started"/>
+      <date key="time:timestamp" value="2026-03-03T21:00:00+00:00"/>
+      <int key="flow_l_min" value="3"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-04T00:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02529/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T03:00:00+00:00"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="94"/>
+      <int key="respiratory_rate" value="34"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T04:00:00+00:00"/>
+      <float key="temperature" value="38.0"/>
+      <int key="oxygen_saturation" value="93"/>
+      <int key="respiratory_rate" value="38"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T03:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="45"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-08T03:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="43"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-09T02:00:00+00:00"/>
+      <float key="temperature" value="37.2"/>
+      <int key="oxygen_saturation" value="95"/>
+      <int key="respiratory_rate" value="26"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-10T04:00:00+00:00"/>
+      <float key="temperature" value="37.4"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="42"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02530"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-04T00:00:00+00:00"/>
+      <int key="age_years" value="3"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="fever, cough and poor feeding"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.8"/>
+      <int key="oxygen_saturation" value="98"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-04T01:00:00+00:00"/>
+      <int key="crp_mg_l" value="22"/>
+      <float key="white_cells_10e9_l" value="7.4"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-04T02:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02530/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-04T09:00:00+00:00"/>
+      <string key="drug" value="ceftriaxone"/>
+      <string key="route" value="intravenous"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T08:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="97"/>
+      <int key="respiratory_rate" value="21"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T10:00:00+00:00"/>
+      <float key="temperature" value="36.7"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="29"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T10:00:00+00:00"/>
+      <float key="temperature" value="37.4"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="32"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Follow-up chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-07T15:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02530/xray2.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-08T06:00:00+00:00"/>
+      <float key="temperature" value="36.9"/>
+      <int key="oxygen_saturation" value="100"/>
+      <int key="respiratory_rate" value="26"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="P02532"/>
+    <event>
+      <string key="concept:name" value="Emergency admission"/>
+      <date key="time:timestamp" value="2026-03-04T08:00:00+00:00"/>
+      <int key="age_years" value="1"/>
+      <string key="sex" value="male"/>
+      <string key="symptoms" value="wheezing and cough"/>
+      <string key="triage" value="standard"/>
+      <float key="temperature" value="37.7"/>
+      <int key="oxygen_saturation" value="95"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Laboratory tests"/>
+      <date key="time:timestamp" value="2026-03-04T09:00:00+00:00"/>
+      <int key="crp_mg_l" value="77"/>
+      <int key="white_cells_10e9_l" value="3"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Chest X-ray"/>
+      <date key="time:timestamp" value="2026-03-04T13:00:00+00:00"/>
+      <string key="view" value="anteroposterior"/>
+      <string key="image" value="P02532/xray1.jpg"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Antibiotics started"/>
+      <date key="time:timestamp" value="2026-03-05T15:00:00+00:00"/>
+      <string key="drug" value="ampicillin"/>
+      <string key="route" value="intravenous"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-05T15:00:00+00:00"/>
+      <float key="temperature" value="37.0"/>
+      <int key="oxygen_saturation" value="96"/>
+      <int key="respiratory_rate" value="28"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-06T18:00:00+00:00"/>
+      <float key="temperature" value="37.2"/>
+      <int key="oxygen_saturation" value="98"/>
+      <int key="respiratory_rate" value="30"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Respiratory deterioration"/>
+      <date key="time:timestamp" value="2026-03-07T13:00:00+00:00"/>
+      <int key="oxygen_saturation" value="87"/>
+      <int key="respiratory_rate" value="50"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-07T15:00:00+00:00"/>
+      <float key="temperature" value="37.6"/>
+      <int key="oxygen_saturation" value="88"/>
+      <int key="respiratory_rate" value="57"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Vital signs"/>
+      <date key="time:timestamp" value="2026-03-08T17:00:00+00:00"/>
+      <float key="temperature" value="37.3"/>
+      <int key="oxygen_saturation" value="89"/>
+      <int key="respiratory_rate" value="46"/>
+      <string key="outcome" value="intensive care"/>
+    </event>
+  </trace>
+</log>

@@ -1,0 +1,217 @@
+# Settings for the CDSL COVID-19 data used in the MEDUSA paper.
+# Paths are relative to the repository root.
+
+[demo]
+title = "Multimodal"
+subtitle = "Process Explorer"
+institution = "unibz"
+logo = "multimodal-explorer.svg"
+# Words the interface uses (see [texts] at the end for whole sentences).
+case_noun = "patient"
+pathway_noun = "pathway"
+image_noun = "radiograph"
+stage_noun = "X-ray"
+day_noun = "day"
+disclaimer = "Not for diagnosis, prognosis, or clinical decision-making. Data subject to the CDSL agreement; aliases replace source identifiers."
+
+[data]
+bundle = "data/curated/demo.json"
+analytics_dir = "data/curated"
+model_cache = "hf-cache"
+# MEDUSA reads radiographs as grayscale.
+grayscale_images = true
+
+# Outcomes in model output order (Death = 0, Home = 1, as in MEDUSA).
+# Charts and metrics follow risk_class.
+[outcome]
+risk_class = "non_survival"
+
+[[outcome.classes]]
+code = "non_survival"
+source_value = "Death"
+label = "In-hospital non-survival"
+short = "non-survival"
+color = "#e34948"
+
+[[outcome.classes]]
+code = "home"
+source_value = "Home"
+label = "Home discharge"
+short = "home"
+color = "#2a78d6"
+
+# Models. kind is the role: text, image or flava (multimodal); adapter = "file.py" plugs in another
+# PyTorch model (see the README, Models).
+[[models]]
+id = "roberta"
+name = "RoBERTa"
+description = "Clinical history"
+kind = "text"
+base = "FacebookAI/roberta-base"
+checkpoint = "covid_roberta4.pth"
+color = "#eda100"
+
+[[models]]
+id = "flava"
+name = "FLAVA"
+description = "History + radiograph"
+kind = "flava"
+base = "facebook/flava-full"
+checkpoint = "covid_flava_7_full.pth"
+color = "#6250d6"
+
+[[models]]
+id = "vit"
+name = "ViT"
+description = "Radiograph only"
+kind = "image"
+base = "google/vit-base-patch16-224"
+checkpoint = "covid_vit2.pth"
+color = "#1baf7a"
+
+# Integrated Gradients of FLAVA, as in the authors' code. Each model can have its own [[explanation]],
+# shown as its own button in the page; for RoBERTa or ViT, method is the path of a Python file with an
+# explain() function (see app/explainers.py and explainers/example_occlusion.py).
+[[explanation]]
+model = "flava"
+method = "integrated_gradients"
+steps = 20
+internal_batch_size = 4
+reference = "the authors' xai/ig_flava.py"
+
+# One timeline lane per event type, with the MEDUSA text templates.
+# prediction_stage marks activities that have an image.
+[[event_types]]
+key = "ed"
+label = "ED"
+color = "#7d5a99"
+
+  [[event_types.activities]]
+  name = "entered in ED"
+  display = "Emergency department admission"
+  leading_space = true
+  template = "{{gender}} patient, {{age}} years old entered in ED. Vital signs were: {{vital_sign_ED}}. Diagnosis was {{diag_emerg}} detailed as: {{list_diagn_er}}."
+
+[[event_types]]
+key = "labs"
+label = "Labs"
+color = "#2f86a6"
+
+  [[event_types.activities]]
+  name = "performed the laboratory tests"
+  display = "Laboratory tests"
+  leading_space = true
+  template = "Patient performed laboratory tests: {{lab_items}} in laboratory {{lab}} {{timesincecasestart}} seconds ago."
+
+[[event_types]]
+key = "vitals"
+label = "Vitals"
+color = "#5a8a55"
+
+  [[event_types.activities]]
+  name = "received vital signs check"
+  display = "Vital signs assessment"
+  leading_space = true
+  template = "Patient received vital signs check: {{vital_sign}} {{timesincecasestart}} seconds ago."
+
+[[event_types]]
+key = "meds"
+label = "Medication"
+color = "#c07a2c"
+
+  [[event_types.activities]]
+  name = "was dispensed medicine"
+  display = "Medication administered"
+  leading_space = true
+  template = "Patient was dispensed medicine:  {{medicine}} {{timesincecasestart}} seconds ago."
+
+[[event_types]]
+key = "icu"
+label = "ICU"
+color = "#b23f4f"
+
+  [[event_types.activities]]
+  name = "entered in ICU"
+  display = "ICU admission"
+  template = "Patient entered in ICU {{timesincecasestart}} seconds ago."
+
+  [[event_types.activities]]
+  name = "discharged from ICU"
+  display = "ICU discharge"
+  template = "Patient discharged from ICU {{timesincecasestart}} seconds ago after being admitted for {{icu_n_ing}} times along {{icu_days}} days."
+
+[[event_types]]
+key = "ct"
+label = "CT"
+color = "#6b7b8a"
+
+  [[event_types.activities]]
+  name = "performed the computed tomography"
+  display = "Computed tomography"
+  template = "Patient performed the computed tomography of {{bodypart}} for {{n_scan}} scans {{timesincecasestart}} seconds ago."
+
+[[event_types]]
+key = "xray"
+label = "X-ray"
+color = "#14283d"
+
+  [[event_types.activities]]
+  name = "performed the computed radiography"
+  display = "Computed radiography"
+  short = "CR"
+  prediction_stage = true
+  template = "Patient performed the computed radiography of {{bodypart}} for {{n_scan}} scans {{timesincecasestart}} seconds ago."
+
+  [[event_types.activities]]
+  name = "performed the digital radiography"
+  display = "Digital radiography"
+  short = "DX"
+  prediction_stage = true
+  template = "Patient performed the digital radiography of {{bodypart}} for {{n_scan}} scans {{timesincecasestart}} seconds ago."
+
+[[event_types]]
+key = "out"
+label = "Discharge"
+color = "#3f4b56"
+
+  [[event_types.activities]]
+  name = "discharged"
+  display = "Hospital discharge"
+  leading_space = true
+  # It states the outcome (and the discharge diagnoses): shown on the timeline, never given to the models
+  reveals_outcome = true
+  template = "Patient discharged with diagnosis: {{list_diagn_hosp}} {{timesincecasestart}} seconds ago."
+
+# Used by scripts/prepare_demo_data.py.
+[preparation]
+source = "CDSL v1.0.0"
+# Cases come from the authors' chronological test split.
+test_split = 0.66
+summary_length = 230
+log_candidates = [
+  "data/covid_log.csv",
+  "data/curated/covid_log.csv",
+  "MEDUSA/preprocessing/covid_log.csv",
+]
+image_candidates = ["data/images", "MEDUSA/dataset/IMAGES"]
+image_env = "CDSL_IMAGES_PATH"
+default_template = "Patient event: {{activity}}."
+# Log columns used by the templates.
+features = [
+  "gender", "age", "diag_emerg", "list_diagn_er", "vital_sign_ED",
+  "list_diagn_hosp", "lab", "lab_items", "medicine", "vital_sign",
+  "icu_days", "icu_n_ing", "bodypart", "n_scan",
+]
+
+[preparation.columns]
+case = "patient_id"
+activity = "activity"
+timestamp = "time:timestamp"
+outcome = "outcome"
+image = "path"
+
+# Sentences of the interface worded for this study; every other text keeps its default
+# (all keys and defaults: app/texts.py).
+[texts]
+scope_context = "Model context (as in MEDUSA)"
+importance_note = "Mean size of the change in {risk}, in percentage points, when an event type is removed (or the {image} blanked) at each of the {count} {image} cutoffs. Hover a bar for the average direction. A bar near zero usually means those events are out of context: the text models only read the most recent 512 tokens, so early events such as the admission are rarely read."

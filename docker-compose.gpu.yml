@@ -1,0 +1,13 @@
+# GPU add-on, not a complete file: Compose merges it into docker-compose.yml, which keeps everything
+# else (build, port, configuration, volume). It only gives the container an NVIDIA GPU (needs the
+# NVIDIA driver; on Linux also the NVIDIA Container Toolkit):
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+services:
+  medusa-demo:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

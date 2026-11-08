@@ -1,0 +1,58 @@
+# The open example: synthetic pediatric respiratory admissions with real chest X-rays
+# (examples/xray-pathways). Everything not set here is read from the event log at setup:
+# one lane per activity, the two X-ray activities as image events, event texts made of all attributes.
+
+[demo]
+title = "Multimodal"
+subtitle = "Process Explorer"
+case_noun = "patient"
+pathway_noun = "pathway"
+image_noun = "radiograph"
+stage_noun = "X-ray"
+disclaimer = "Synthetic pathways with chest X-rays from Kermany et al. (CC BY 4.0); not for clinical use."
+
+[data]
+grayscale_images = true
+
+# Model output order: index 0 is home, 1 is intensive care (scripts/train_models.py trains in this order)
+[outcome]
+risk_class = "intensive_care"
+
+[[outcome.classes]]
+code = "home"
+source_value = "home"
+label = "Discharged home"
+
+[[outcome.classes]]
+code = "intensive_care"
+source_value = "intensive care"
+label = "Transferred to intensive care"
+short = "intensive care"
+
+[[models]]
+kind = "text"
+id = "text"
+name = "RoBERTa"
+description = "Clinical history"
+checkpoint = "models/xray-pathways/text.pth"
+
+[[models]]
+kind = "image"
+id = "image"
+name = "ViT"
+description = "Latest radiograph"
+checkpoint = "models/xray-pathways/image.pth"
+
+[[models]]
+kind = "flava"
+id = "multimodal"
+name = "FLAVA"
+description = "History + radiograph"
+checkpoint = "models/xray-pathways/multimodal.pth"
+
+[preparation]
+source = "scripts/make_xray_pathways.py"
+
+[preparation.columns]
+image = "image"
+outcome = "outcome"

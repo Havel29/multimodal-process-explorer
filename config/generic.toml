@@ -1,0 +1,29 @@
+# Starting point for a new dataset: EXPLORER_CONFIG=config/generic.toml
+#
+# Nothing here is required. At setup the explorer reads from the event log what this file leaves out:
+# one timeline lane per activity, the activities with an image as prediction stages, the label values
+# as outcome classes, and event texts made of all the event's attributes. The setup lists what it
+# read, and saves the completed configuration to data/runtime/config.toml: copy it to config/ and
+# edit it to rename lanes, group activities or write proper text templates
+# (or draft one beforehand with scripts/draft_config.py).
+#
+# Check one thing: the outcome classes must be in the order of the models' outputs. Without an
+# [outcome] section the setup assumes alphabetical order.
+
+[demo]
+title = "Multimodal"
+subtitle = "Process Explorer"
+disclaimer = ""
+
+# [outcome]
+# risk_class = "rejected"
+#
+# [[outcome.classes]]
+# code = "approved"
+# source_value = "approved"
+# label = "Claim approved"
+#
+# [[outcome.classes]]
+# code = "rejected"
+# source_value = "rejected"
+# label = "Claim rejected"

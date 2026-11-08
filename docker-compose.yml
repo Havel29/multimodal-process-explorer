@@ -1,0 +1,19 @@
+services:
+  medusa-demo:
+    # The prebuilt image is downloaded; with --build it is built from this folder instead
+    image: ghcr.io/havel29/multimodal-process-explorer:1.0
+    build: .
+    init: true
+    ports:
+      - "8000:8000"
+    environment:
+      # The open X-ray example by default; set EXPLORER_CONFIG in .env for another configuration
+      EXPLORER_CONFIG: ${EXPLORER_CONFIG:-config/xray_pathways.toml}
+    volumes:
+      - medusa-runtime:/app/data/runtime
+      # Configurations are read from this folder, so an edited one needs no rebuild
+      - ./config:/app/config:ro
+    restart: unless-stopped
+
+volumes:
+  medusa-runtime:

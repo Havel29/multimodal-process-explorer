@@ -1,0 +1,8 @@
+# Packages for building the CDSL log (README, "The CDSL example", steps 2-4): the MEDUSA
+# preprocessing and the scripts create_demo_xes.py and extract_demo_images.py. The explorer
+# itself runs in Docker and doesn't need this file.
+pandas==2.2.2
+numpy==1.26.4
+jinja2==3.1.6
+pillow==10.2.0
+pm4py>=2.7,<3
