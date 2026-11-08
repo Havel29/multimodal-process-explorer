@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Multimodal Process Explorer</title>
+  <defs>
+    <linearGradient id="background" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#183a57"/>
+      <stop offset="1" stop-color="#0d2235"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#background)"/>
+  <path d="M16 22h13l8 20h11" fill="none" stroke="#dbe7f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 42h13l8-20h11" fill="none" stroke="#8da6ba" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="16" cy="22" r="6" fill="#eda100" stroke="#fff" stroke-width="2"/>
+  <circle cx="16" cy="42" r="6" fill="#1baf7a" stroke="#fff" stroke-width="2"/>
+  <circle cx="37" cy="32" r="7" fill="#6250d6" stroke="#fff" stroke-width="2"/>
+  <circle cx="49" cy="22" r="6" fill="#eda100" stroke="#fff" stroke-width="2"/>
+  <circle cx="49" cy="42" r="6" fill="#1baf7a" stroke="#fff" stroke-width="2"/>
+</svg>
