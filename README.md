@@ -149,16 +149,22 @@ The tabs at the top open the **Case view**, the **Statistics** page and the
   the latest image appear at once; the prediction lines follow in the
   background.
 - **Timeline:** one lane per event type. Images are the `IMG` markers. Below the
-  lanes, a chart shows how the risk changes over time for each model. Drag the
-  bar under the timeline down for a taller chart, or up for more room below
-  (double-click resets it).
+  lanes, a chart shows how the probability of the **class shown** changes over
+  time for each model. Drag the bar under the timeline down for a taller chart,
+  or up for more room below (double-click resets it).
+- **Zoom:** when events crowd together, zoom in with **+** (or Ctrl + scroll on
+  the timeline); **-** zooms out and **All** shows the whole case again. The
+  browse bar under the days is the whole case: drag its box to move along it,
+  or scroll sideways (Shift + scroll).
 - **What the models know:**
   - drag the black line, click the timeline or pick a day to set the cutoff;
     **Jump to end** puts it back at the last event, with every event;
   - click an image marker to predict right after that image;
   - click a lane name to remove its events, and click it again to add them back;
   - drag a box over events to use only those, or to exclude them;
-  - tick or untick single events in **Events given to the models**.
+  - tick or untick single events in **Events given to the models**; its search
+    box filters the list, and **Select all** and **Clear** then act on the
+    matching events only.
 - **Predictions:** each model's predicted outcome and probability, whether it
   matches the observed outcome, and the inference time.
 - **Why?:** one **Explain** button per explained model (by default the
@@ -172,12 +178,20 @@ The tabs at the top open the **Case view**, the **Statistics** page and the
   the predictions. A case is included once its prediction lines are computed:
   the cases you opened already are, and **Compute missing cases** does the
   rest. Results are kept until **Reset statistics**.
+- **Class shown:** the class whose probability the prediction lines, the
+  statistics (ROC AUC, Brier score, event importance) and the explanations
+  show. It starts at the risk class of the configuration (the rarest unless
+  set) and the browser remembers your choice.
 - **Inference:** switch between Auto, CPU and GPU.
 - **Download CSV:** what the page shows, as one table. In the Case view: each
   model's prediction at the cutoff (class probabilities, device and inference
   time), the points of the prediction lines, and the event scores of the last
   explanation. In Statistics: the prediction lines and the event-type
-  importance of every computed case.
+  importance of every computed case. There is a `p_<class>` column per class,
+  and for the importance a `delta_<class>` column per class (`score` is the
+  class shown). Each column belongs to some kinds of rows only (device and
+  inference time to predictions, event and score to explanations and
+  importance), so the other rows leave it empty.
 
 ## Your own dataset
 
@@ -195,13 +209,15 @@ During setup, the explorer reads the following from the event log:
 | --- | --- |
 | Timeline lanes | One per activity. |
 | Image events | The activities whose events have a value in the image field. |
-| Outcome classes | The values of the label field, two or more. The rarest one is the risk class, unless `risk_class` in `[outcome]` names another. |
+| Outcome classes | The values of the label field, two or more. The rarest one is the risk class, unless `risk_class` in `[outcome]` names another; the page can show any class (**Class shown**). |
 | Event texts | The activity and all event attributes, except the label. |
 
 A model's prediction is its most probable class; accuracy, settling, flips and
 agreement are based on it. The prediction lines, ROC AUC, Brier score, event
-importance and explanation colours follow the risk class against all the
-others, so they read the same with two or more classes.
+importance and explanation colours follow the class shown against all the
+others, so they read the same with two or more classes. Prediction lines
+computed before an update that keeps every class work for two classes; with
+more, **Reset statistics** computes them again.
 
 Before the explorer opens, the setup lists what it read. Check one thing: the
 log can't tell the order of the models' outputs, so the classes are assumed to
@@ -217,7 +233,9 @@ docker compose cp medusa-demo:/app/data/runtime/config.toml config/mine.toml
 
 Then put `EXPLORER_CONFIG=config/mine.toml` in `.env` and restart with
 `docker compose up -d`: the `config/` folder is mounted into the container, so
-no rebuild is needed. You can also draft one before any setup, with the Python
+no rebuild is needed. A configuration with the same outcome classes and its own
+event types replaces the saved one at every start; one for other data does not,
+and needs a new setup. You can also draft one before any setup, with the Python
 environment of [Development](#development):
 
 ```bash
