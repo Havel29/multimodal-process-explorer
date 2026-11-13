@@ -117,7 +117,8 @@ The explorer starts with the configuration of the open example. To use the
 CDSL data or your own, see the sections below.
 
 After a restart, **Continue with the data already loaded** reopens the last
-setup without uploading anything again. To stop the application, run
+setup without uploading anything again. The setup stays reachable from the
+**Inputs** tab. To stop the application, run
 `docker compose down`; to also remove the loaded data and the image, run
 `docker compose down -v` and
 `docker image rm ghcr.io/havel29/multimodal-process-explorer:1.0` (`:1.0-gpu`
@@ -140,12 +141,20 @@ and the Statistics page are hidden.
 
 ## Using the explorer
 
-- **Case:** choose one at the top. Its events appear at once, and the
-  predictions are computed in the background.
+The tabs at the top open the **Case view**, the **Statistics** page and the
+**Inputs** (the setup). **Help** starts a short guided tour of the Case view.
+
+- **Case:** choose one at the top of the Case view. It opens with the cutoff at
+  its last event and every event given to the models, so the predictions and
+  the latest image appear at once; the prediction lines follow in the
+  background.
 - **Timeline:** one lane per event type. Images are the `IMG` markers. Below the
-  lanes, a chart shows how the risk changes over time for each model.
+  lanes, a chart shows how the risk changes over time for each model. Drag the
+  bar under the timeline down for a taller chart, or up for more room below
+  (double-click resets it).
 - **What the models know:**
   - drag the black line, click the timeline or pick a day to set the cutoff;
+    **Jump to end** puts it back at the last event, with every event;
   - click an image marker to predict right after that image;
   - click a lane name to remove its events, and click it again to add them back;
   - drag a box over events to use only those, or to exclude them;
@@ -160,12 +169,15 @@ and the Statistics page are hidden.
   their summed attribution.
 - **Statistics:** how the models behave over time across the loaded cases:
   discrimination, calibration, earliness, stability, and which event types move
-  the predictions.
+  the predictions. A case is included once its prediction lines are computed:
+  the cases you opened already are, and **Compute missing cases** does the
+  rest. Results are kept until **Reset statistics**.
 - **Inference:** switch between Auto, CPU and GPU.
-- **Download CSV:** what the explorer shows for the open case, as one table:
-  each model's prediction at the cutoff (class probabilities, device and
-  inference time), the points of the prediction lines, and the event scores of
-  the last explanation.
+- **Download CSV:** what the page shows, as one table. In the Case view: each
+  model's prediction at the cutoff (class probabilities, device and inference
+  time), the points of the prediction lines, and the event scores of the last
+  explanation. In Statistics: the prediction lines and the event-type
+  importance of every computed case.
 
 ## Your own dataset
 
