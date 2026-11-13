@@ -59,13 +59,13 @@ Check the installation with `docker compose version`.
 
 ## Quick start
 
-You need about 20 GB of free disk (15 GB for the image, the rest for the
+You need about 10 GB of free disk (about 4 GB for the image, the rest for the
 checkpoints and the uploaded files) and 8 GB of RAM; on Windows and macOS,
 check that Docker Desktop may use at least 8 GB (Settings, Resources). Downloading the image takes
-from a few minutes to half an hour, depending on the connection. Without a GPU,
-everything runs on the CPU: predictions are slower and explanations of the
-whole history can take minutes. The image is built for x86-64; on Macs with
-Apple silicon, Docker runs it through emulation, which is slower still.
+from a few minutes to a quarter of an hour, depending on the connection. The default image runs
+everything on the CPU, natively on x86-64 and on ARM64 (including Macs with Apple silicon):
+predictions take a few seconds and explanations up to a minute or two. With an NVIDIA GPU, a
+separate CUDA image (about 15 GB of disk) makes them faster; see step 3.
 
 1. Download this repository (green **Code** button, then **Download ZIP**, or
    `git clone`) and open a terminal in its folder.
@@ -75,13 +75,14 @@ Apple silicon, Docker runs it through emulation, which is slower still.
    into a folder, for example `models/xray-pathways/`.
 3. Start the application. The first time, this downloads the prebuilt image
    ([ghcr.io/havel29/multimodal-process-explorer](https://github.com/users/Havel29/packages/container/package/multimodal-process-explorer),
-   about 15 GB once unpacked):
+   about 4 GB on disk):
 
    ```bash
    docker compose up -d
    ```
 
-   With an NVIDIA GPU, add the GPU file instead:
+   With an NVIDIA GPU, add the GPU file instead; it downloads the CUDA image
+   (`1.0-gpu`, about 15 GB on disk):
 
    ```bash
    docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
@@ -98,8 +99,8 @@ Apple silicon, Docker runs it through emulation, which is slower still.
    If the inference menu shows "GPU (unavailable)", the container was started
    without the GPU file.
 
-   To build the image from this folder instead (15 minutes to an hour), add
-   `--build`.
+   To build the image from this folder instead (10 minutes to an hour), add
+   `--build`; with the GPU file, it builds the CUDA variant.
 
 4. Open [http://localhost:8000](http://localhost:8000).
 5. Go through the two-step setup:
@@ -117,9 +118,10 @@ CDSL data or your own, see the sections below.
 
 After a restart, **Continue with the data already loaded** reopens the last
 setup without uploading anything again. To stop the application, run
-`docker compose down`; to also remove the loaded data and the image (about
-17 GB), run `docker compose down -v` and
-`docker image rm ghcr.io/havel29/multimodal-process-explorer:1.0`.
+`docker compose down`; to also remove the loaded data and the image, run
+`docker compose down -v` and
+`docker image rm ghcr.io/havel29/multimodal-process-explorer:1.0` (`:1.0-gpu`
+for the CUDA image).
 
 ## Inputs
 

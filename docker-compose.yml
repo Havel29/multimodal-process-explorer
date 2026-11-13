@@ -1,6 +1,7 @@
 services:
   medusa-demo:
-    # The prebuilt image is downloaded; with --build it is built from this folder instead
+    # The prebuilt CPU image (x86-64 and ARM64) is downloaded; with --build it is built from this
+    # folder instead. docker-compose.gpu.yml switches to the NVIDIA CUDA image (1.0-gpu).
     image: ghcr.io/havel29/multimodal-process-explorer:1.0
     build: .
     init: true

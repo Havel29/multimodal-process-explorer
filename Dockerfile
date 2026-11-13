@@ -1,4 +1,9 @@
-FROM pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
+# Two variants of the same image:
+#   CPU (default, ~3 GB, x86-64 and ARM64): docker build .
+#   GPU (NVIDIA CUDA, ~10 GB, x86-64):       docker build --build-arg BASE_IMAGE=pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime --build-arg TORCH_INDEX= .
+# The CUDA base already ships PyTorch; on the slim base it comes from the CPU wheel index.
+ARG BASE_IMAGE=python:3.11-slim
+FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.source="https://github.com/Havel29/multimodal-process-explorer" \
       org.opencontainers.image.description="Multimodal Process Explorer: multimodal predictive process monitoring, case by case" \
@@ -6,6 +11,8 @@ LABEL org.opencontainers.image.source="https://github.com/Havel29/multimodal-pro
 
 # Which explorer configuration to serve; see config/.
 ARG EXPLORER_CONFIG=config/xray_pathways.toml
+# PyTorch wheel index; empty when the base image already has PyTorch
+ARG TORCH_INDEX=https://download.pytorch.org/whl/cpu
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -15,7 +22,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN if [ -n "$TORCH_INDEX" ]; then \
+        pip install --no-cache-dir torch==2.9.1 torchvision==0.24.1 --index-url "$TORCH_INDEX"; \
+    fi \
+    && pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 COPY config ./config

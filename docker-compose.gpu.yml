@@ -1,9 +1,14 @@
 # GPU add-on, not a complete file: Compose merges it into docker-compose.yml, which keeps everything
-# else (build, port, configuration, volume). It only gives the container an NVIDIA GPU (needs the
-# NVIDIA driver; on Linux also the NVIDIA Container Toolkit):
-#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# else (port, configuration, volume). It switches to the CUDA image and gives the container an NVIDIA
+# GPU (needs the NVIDIA driver; on Linux also the NVIDIA Container Toolkit):
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
 services:
   medusa-demo:
+    image: ghcr.io/havel29/multimodal-process-explorer:1.0-gpu
+    build:
+      args:
+        BASE_IMAGE: pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
+        TORCH_INDEX: ""
     deploy:
       resources:
         reservations:
