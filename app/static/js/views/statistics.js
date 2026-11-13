@@ -16,8 +16,7 @@ let computeRun = 0;  // a reset bumps it, which stops a running computation
 let showAllTypes = false;
 
 const els = {
-  patientView: document.getElementById("patientView"),
-  view: document.getElementById("statisticsView"),
+  computed: document.getElementById("statisticsComputed"),
   caveat: document.getElementById("statisticsCaveat"),
   charts: document.getElementById("statisticsCharts"),
   table: document.getElementById("statisticsTable"),
@@ -39,14 +38,8 @@ export function init() {
   });
 }
 
-export function hide() {
-  els.view.classList.add("hidden");
-  els.patientView.classList.remove("hidden");
-}
-
+/** Fill the Statistics page (the controller shows it). */
 export async function show() {
-  els.patientView.classList.add("hidden");
-  els.view.classList.remove("hidden");
   try {
     render((await api.statistics()).patients);
   } catch (error) {
@@ -131,6 +124,11 @@ function render(rawPatients) {
   const minimumChartPatients = Math.max(2, Math.ceil(computed.length * MIN_CHART_PATIENT_SHARE));
   const chartDays = spacedDays(supportedHorizon(computed, minimumChartPatients));
   const shownDays = tableDays(computed);
+  // Cases opened in the Case view compute their prediction lines, and computed results are kept
+  // until a reset: say so, or results present on the first visit look unexplained.
+  els.computed.textContent = `${computed.length} of ${plural(patients.length, "case")} computed. `
+    + "Opening a case in the Case view computes its prediction lines, so the cases you opened are already included; "
+    + "results are kept until you reset them.";
   els.caveat.textContent = fill("statistics_caveat", {
     count: patients.length, last_day: `${texts.day} ${chartDays.at(-1)}`, minimum: minimumChartPatients, table_day: `${texts.day} ${shownDays.at(-1)}`,
   });

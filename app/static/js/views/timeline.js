@@ -2,7 +2,7 @@
 import { DAY, config, displayName, eventTypeOf, models, riskLabel, shortName, stageNoun, texts } from "../config.js";
 import { focusEvent, loadTrajectory, setCutoff, setEventType, setKnowledge } from "../controller.js";
 import { escapeHtml, percent, plural, timeLabel } from "../format.js";
-import { availableEvents, cutoffLabel, dayCutoff, eventById, stageCutoff, state } from "../state.js";
+import { atEnd, availableEvents, cutoffLabel, dayCutoff, endCutoff, eventById, stageCutoff, state } from "../state.js";
 
 const SNAP_PIXELS = 9;
 const DRAG_THRESHOLD = 5;
@@ -88,7 +88,9 @@ export function render() {
   container.innerHTML = `<div class="plot-under">${dayBands()}</div>
     <div class="lane-scroll ${scrolling ? "scrolling" : ""}" style="--visible-lanes: ${MAX_VISIBLE_LANES}">${rows}</div>
     ${hint}${chartLabel}<div class="chart">${chart()}</div>
-    <span></span><div class="axis">${axis()}</div>
+    <span class="axis-side"><button class="jump-end" data-jump-end type="button" ${atEnd() ? "disabled" : ""}
+      title="Move the cutoff to the last event and give the models every event of the case">Jump to end</button></span>
+    <div class="axis">${axis()}</div>
     <div class="plot-over">${cutoffLine()}</div>`;
   container.querySelector(".lane-scroll").scrollTop = scrollTop;
 }
@@ -242,6 +244,7 @@ function laneIsOff(typeKey) {
 
 function onClick(event) {
   if (event.target.closest("[data-compute-trajectory]")) return loadTrajectory(true);
+  if (event.target.closest("[data-jump-end]")) return setCutoff(endCutoff());
   const lane = event.target.closest("[data-lane]");
   if (lane) return setEventType(lane.dataset.lane, laneIsOff(lane.dataset.lane));
   const day = event.target.closest("[data-day]");

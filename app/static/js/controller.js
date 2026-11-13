@@ -1,7 +1,8 @@
 // User actions. Each one updates the state, then re-renders the views it affects.
 import { api } from "./api.js";
 import { DAY, eventTypeOf, models } from "./config.js";
-import { availableEvents, imageEvent, selectionBody, state } from "./state.js";
+import * as setup from "./setup.js";
+import { availableEvents, endCutoff, imageEvent, selectionBody, state } from "./state.js";
 import * as analysis from "./views/analysis.js";
 import * as header from "./views/header.js";
 import * as knowledge from "./views/knowledge.js";
@@ -13,6 +14,23 @@ import { showToast } from "./views/toast.js";
 
 let patientSelectionToken = 0;
 
+// One page per tab; only the active one is shown.
+const PAGES = { patient: "patientView", statistics: "statisticsView", inputs: "setupWizard" };
+
+function showPage(view) {
+  state.view = view;
+  for (const [key, id] of Object.entries(PAGES)) document.getElementById(id).classList.toggle("hidden", key !== view);
+  // A reload stays on the same tab (the Inputs page reopens the Case view)
+  if (view !== "inputs") history.replaceState(null, "", `#${view === "statistics" ? setup.STATISTICS_HASH : setup.EXPLORER_HASH}`);
+  header.renderTabs();
+}
+
+/** Leaving the case view stops its running predictions and explanation; they restart on return. */
+function leaveCaseView() {
+  state.runToken += 1;
+  state.analysisToken += 1;
+}
+
 export function renderAll() {
   timeline.render();
   stage.render();
@@ -21,6 +39,10 @@ export function renderAll() {
   analysis.renderButtons();
 }
 
+/**
+ * Open a case with the cutoff at its last event and every event selected, and run the models.
+ * Its prediction lines are computed afterwards, so they do not delay the first predictions.
+ */
 export async function selectPatient(patientId) {
   if (state.patientLoading || (state.view === "patient" && state.patient?.id === patientId)) return;
   const token = ++patientSelectionToken;
@@ -30,22 +52,20 @@ export async function selectPatient(patientId) {
     const patient = await api.patient(patientId);
     if (token !== patientSelectionToken) return;
     Object.assign(state, {
-      view: "patient", patient, cutoff: null, focused: null, enabled: new Set(),
-      predicting: false, trajectory: null, trajectoryLoading: false,
+      patient, cutoff: null, focused: null, enabled: new Set(),
+      predicting: false, trajectory: null, trajectoryLoading: true,
       stayDays: Math.max(1, Math.ceil(patient.duration_seconds / DAY)),
     });
     state.runToken += 1;
-    statistics.hide();
+    showPage("patient");
     timeline.closeBrush();
     analysis.clear();
     predictions.reset();
     header.render();
-    renderAll();
-    // Trajectories are expensive. Start a missing one in the background so the
-    // case controls and Statistics remain usable while inference runs. The
-    // patient-id check in loadTrajectory discards stale UI results after a
-    // navigation, while the backend keeps the completed trajectory cached.
-    void loadTrajectory(true);
+    setCutoff(endCutoff(), { run: false });
+    void runPrediction().finally(() => {
+      if (state.patient?.id === patient.id) void loadTrajectory(true);
+    });
   } catch (error) {
     if (token === patientSelectionToken) showToast(error.message);
   } finally {
@@ -54,6 +74,33 @@ export async function selectPatient(patientId) {
       header.renderTabs();
     }
   }
+}
+
+/** The Case view tab: back to the open case as it was left, or the first case. */
+export async function showCaseView() {
+  if (!state.patient) {
+    if (state.patients.length) await selectPatient(state.patients[0].id);
+    return;
+  }
+  showPage("patient");
+  renderAll();  // the layout may have changed while the page was hidden
+  // Predictions interrupted by leaving the page run again
+  if (state.predicting) {
+    state.predicting = false;
+    void runPrediction();
+  }
+}
+
+export async function showStatistics() {
+  leaveCaseView();
+  showPage("statistics");
+  await statistics.show();
+}
+
+export function showInputs() {
+  leaveCaseView();
+  showPage("inputs");
+  setup.open();
 }
 
 /** Move the cutoff; every event known at the new cutoff is given to the models. */
@@ -85,10 +132,7 @@ export function toggleEvents(eventIds, enabled) {
 
 /** Turn every known event of one type off or on, then re-run. Without a cutoff, the whole stay is used. */
 export function setEventType(typeKey, enabled) {
-  if (!state.cutoff) {
-    const events = state.patient.events;
-    setCutoff({ kind: "free", seconds: events[events.length - 1].offset_seconds }, { run: false });
-  }
+  if (!state.cutoff) setCutoff(endCutoff(), { run: false });
   for (const event of availableEvents()) {
     if (eventTypeOf(event.activity).key !== typeKey) continue;
     if (enabled) state.enabled.add(event.id);
@@ -156,12 +200,4 @@ export async function loadTrajectory(compute) {
       header.renderInsights();
     }
   }
-}
-
-export async function showStatistics() {
-  state.view = "statistics";
-  state.runToken += 1;
-  state.analysisToken += 1;
-  header.renderTabs();
-  await statistics.show();
 }

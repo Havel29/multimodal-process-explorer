@@ -3,7 +3,7 @@ import { DAY, displayName, shortName, texts } from "./config.js";
 import { plural, timeLabel } from "./format.js";
 
 export const state = {
-  view: "patient",
+  view: "patient",  // "patient" (Case view), "statistics" or "inputs"
   patients: [],
   patient: null,
   patientLoading: false,
@@ -55,6 +55,18 @@ export function selectionBody() {
   else if (state.cutoff.kind === "stage") body.stage_event_id = state.cutoff.stageId;
   else body.cutoff_seconds = Math.round(state.cutoff.seconds);
   return body;
+}
+
+/** The cutoff at the last event of the case: the models see the whole trace. */
+export function endCutoff() {
+  const events = state.patient.events;
+  return { kind: "free", seconds: events[events.length - 1].offset_seconds };
+}
+
+/** True when the cutoff is at the last event and every event is selected. */
+export function atEnd() {
+  if (!state.cutoff || !state.patient) return false;
+  return state.cutoff.seconds >= endCutoff().seconds && state.enabled.size === availableEvents().length;
 }
 
 export const dayCutoff = (day) => ({ kind: "day", day, seconds: day * DAY });

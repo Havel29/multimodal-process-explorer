@@ -13,6 +13,19 @@ def test_interface_has_no_motion_effects():
     assert "transition:" not in css.replace("transition: none !important", "")
 
 
+def test_only_the_help_tour_moves_and_not_with_reduced_motion():
+    # The tour is the one place with motion, on purpose; it stops when the system asks for less motion.
+    tour = re.sub(r"/\*.*?\*/", "", (STATIC / "css" / "tour.css").read_text(encoding="utf-8"), flags=re.DOTALL)
+    # The selector of every innermost rule (inside @media and @keyframes too)
+    selectors = [part.strip() for rule in re.findall(r"([^{}]+)\{[^{}]*\}", tour) for part in rule.split(",")]
+
+    assert selectors
+    keyframe = re.compile(r"^(from|to|\d+%)$")
+    outside = [selector for selector in selectors if not selector.startswith(".tour") and not keyframe.match(selector)]
+    assert not outside, outside
+    assert "@media (prefers-reduced-motion: reduce)" in tour
+
+
 def test_interface_is_plain_ascii():
     for path in INTERFACE_FILES:
         text = path.read_text(encoding="utf-8")
@@ -23,8 +36,9 @@ def test_interface_is_plain_ascii():
 def test_application_opens_on_the_inputs_page():
     main = (STATIC / "js" / "main.js").read_text(encoding="utf-8")
 
-    assert "setup.init({ open: !exploring, canContinue: status.configured });" in main
-    assert "status.configured && window.location.hash ===" in main
+    # The explorer opens only on #explorer or #statistics with a completed setup
+    assert "setup.init({ open: !exploring, canContinue: status.configured," in main
+    assert "const exploring = status.configured && [setup.EXPLORER_HASH, setup.STATISTICS_HASH].includes(page);" in main
 
 
 def test_interface_has_no_dataset_specific_names():

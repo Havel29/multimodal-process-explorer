@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   {% if config.logo %}<link rel="icon" href="/static/{{ config.logo }}">{% endif %}
   <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/tour.css">
   <style>
     :root {
       {% for type in public_config.eventTypes %}--lane-{{ type.key }}: {{ type.color }};
@@ -21,6 +22,33 @@
   <script type="module" src="/static/js/main.js"></script>
 </head>
 <body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="{{ config.title }} home">
+      {% if config.logo %}<img src="/static/{{ config.logo }}" alt="" width="36" height="36">{% endif %}
+      <strong>{{ config.title }}</strong><span>{{ config.subtitle }}</span>
+    </a>
+    <nav class="view-tabs" aria-label="Views">
+      <button id="caseTab" class="view-tab" type="button">Case view</button>
+      <button id="statisticsTab" class="view-tab{% if not config.labels_available %} hidden{% endif %}" type="button">{{ public_config.texts.statistics_title }}</button>
+      <button id="inputsTab" class="view-tab" type="button">Inputs</button>
+    </nav>
+    <nav class="patient-picker hidden" aria-label="Case navigation">
+      <button id="previousPatient" type="button" aria-label="Previous case" title="Previous case">&#8249;</button>
+      <label><select id="patientSelect" aria-label="Select case"></select></label>
+      <button id="nextPatient" type="button" aria-label="Next case" title="Next case">&#8250;</button>
+    </nav>
+    <div class="runtime-controls">
+      <label>Inference <select id="deviceSelect" aria-label="Inference device">
+        <option value="auto">Auto</option>
+        <option value="cpu">CPU</option>
+        <option value="gpu">GPU</option>
+      </select></label>
+      <button id="exportCsv" type="button" title="The predictions, prediction lines and explanation of this case, as a CSV file">Download CSV</button>
+      <button id="helpButton" type="button" title="A short guided tour of the explorer">Help</button>
+    </div>
+    {% if config.institution %}<span class="institution">{{ config.institution }}</span>{% endif %}
+  </header>
+
   <main id="setupWizard" class="setup-wizard hidden" aria-labelledby="setupTitle">
     <section class="setup-card">
       <p id="setupStep" class="setup-step">Multimodal setup - Step 1 of 2</p>
@@ -53,30 +81,8 @@
       <p id="setupMessage" class="setup-message" role="status"></p>
     </section>
   </main>
-  <header class="topbar">
-    <a class="brand" href="/" aria-label="{{ config.title }} home">
-      {% if config.logo %}<img src="/static/{{ config.logo }}" alt="" width="36" height="36">{% endif %}
-      <strong>{{ config.title }}</strong><span>{{ config.subtitle }}</span>
-    </a>
-    <nav class="patient-picker" aria-label="Case navigation">
-      <button id="previousPatient" type="button" aria-label="Previous case" title="Previous case">&#8249;</button>
-      <label><select id="patientSelect" aria-label="Select case"></select></label>
-      <button id="nextPatient" type="button" aria-label="Next case" title="Next case">&#8250;</button>
-    </nav>
-    <button id="statisticsTab" class="patient-tab statistics-tab{% if not config.labels_available %} hidden{% endif %}" type="button">{{ public_config.texts.statistics_title }}</button>
-    <div class="runtime-controls">
-      <button id="setupOpen" type="button">Inputs</button>
-      <label>Inference <select id="deviceSelect" aria-label="Inference device">
-        <option value="auto">Auto</option>
-        <option value="cpu">CPU</option>
-        <option value="gpu">GPU</option>
-      </select></label>
-      <button id="exportCsv" type="button" title="The predictions, prediction lines and explanation of this case, as a CSV file">Download CSV</button>
-    </div>
-    {% if config.institution %}<span class="institution">{{ config.institution }}</span>{% endif %}
-  </header>
 
-  <main id="patientView" class="workspace">
+  <main id="patientView" class="workspace hidden">
     <section class="pathway">
       <div class="patient-bar">
         <div>
@@ -89,6 +95,9 @@
       <div id="swimlanes" class="swimlanes" aria-label="Case timeline"></div>
       <p id="eventDetail" class="event-detail">{{ public_config.texts.timeline_help }}</p>
     </section>
+
+    <div id="splitter" class="splitter" role="separator" aria-orientation="horizontal" aria-label="Resize the timeline" tabindex="0"
+      title="Drag to give the timeline more or less room; double-click to reset"></div>
 
     <section class="panels">
       <div class="stage-image">
@@ -155,6 +164,7 @@
       <div>
         <h1>{{ public_config.texts.statistics_title }}</h1>
         <p>{{ public_config.texts.statistics_intro }}</p>
+        <p id="statisticsComputed" class="computed-note"></p>
         <p id="statisticsCaveat" class="caveat"></p>
       </div>
       <div class="statistics-actions">

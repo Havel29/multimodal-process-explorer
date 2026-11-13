@@ -1,9 +1,13 @@
-// "Download CSV": a snapshot of what the explorer shows for the open case, as one table.
+// "Download CSV": what the open page shows, as one table.
+// In the Case view, a snapshot of the open case; in Statistics, every computed case.
 // The section column says what a row is:
 //   prediction   each model's prediction at the current cutoff (the Predictions panel)
 //   trajectory   each point of the prediction lines under the timeline
 //   explanation  each event's score in the last explanation (the Why? panel), if one was run
-import { config, displayName, models, modelById, riskOutcome, texts } from "./config.js";
+//   importance   (Statistics) at each image cutoff, the change in the risk probability when every event
+//                of that type is removed (score; for the image models, the image is blanked)
+import { api } from "./api.js";
+import { capitalized, config, displayName, imageNoun, models, modelById, riskOutcome, texts } from "./config.js";
 import { predictedClass } from "./metrics.js";
 import { timeLabel } from "./format.js";
 import { availableEvents, cutoffLabel, eventById, state } from "./state.js";
@@ -15,7 +19,27 @@ const COLUMNS = ["section", "case", "observed_outcome", "cutoff", "cutoff_time",
   ...probabilityColumns, "matches_observed", "device", "inference_ms", "event", "event_time", "score"];
 
 export function init() {
-  button.addEventListener("click", download);
+  button.addEventListener("click", () => (state.view === "statistics" ? downloadStatistics() : download()));
+}
+
+/** The rows of one case's prediction lines; where names the cutoff of a point. */
+function trajectoryRows(points, base, truth, where) {
+  const out = [];
+  for (const point of points || []) {
+    for (const model of models) {
+      const risk = point.risk[model.id];
+      if (risk === null || risk === undefined) continue;
+      // As in the statistics: the most probable class
+      const code = predictedClass(point, model.id);
+      const predicted = config.outcomes.find((outcome) => outcome.code === code) || { code, label: code };
+      out.push({
+        section: "trajectory", ...base, cutoff: where(point), cutoff_time: timeLabel(point.offset_seconds), model: model.name,
+        predicted: predicted.label, [`p_${riskOutcome.code}`]: risk,
+        matches_observed: truth ? predicted.code === truth.code : "",
+      });
+    }
+  }
+  return out;
 }
 
 function rows() {
@@ -40,21 +64,8 @@ function rows() {
     }
   }
 
-  for (const point of state.trajectory || []) {
-    const where = point.kind === "day" ? `End of ${texts.day} ${point.day}` : displayName(eventById(point.stage_event_id));
-    for (const model of models) {
-      const risk = point.risk[model.id];
-      if (risk === null || risk === undefined) continue;
-      // As in the statistics: the most probable class
-      const code = predictedClass(point, model.id);
-      const predicted = config.outcomes.find((outcome) => outcome.code === code) || { code, label: code };
-      out.push({
-        section: "trajectory", ...base, cutoff: where, cutoff_time: timeLabel(point.offset_seconds), model: model.name,
-        predicted: predicted.label, [`p_${riskOutcome.code}`]: risk,
-        matches_observed: patient.ground_truth ? predicted.code === patient.ground_truth.code : "",
-      });
-    }
-  }
+  out.push(...trajectoryRows(state.trajectory, base, patient.ground_truth, (point) =>
+    (point.kind === "day" ? `End of ${texts.day} ${point.day}` : displayName(eventById(point.stage_event_id)))));
 
   const explanation = state.explanation;
   if (explanation && state.cutoff) {
@@ -75,13 +86,51 @@ function cell(value) {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-function download() {
-  if (!state.patient) return showToast("Open a case first.");
-  const lines = [COLUMNS.join(","), ...rows().map((row) => COLUMNS.map((column) => cell(row[column])).join(","))];
+/** Every computed case of the Statistics page: its prediction lines and its event-type importance. */
+async function statisticsRows() {
+  const { patients } = await api.statistics();
+  const imageCutoff = (offset) => `${capitalized(imageNoun)}, ${timeLabel(offset)}`;
+  const out = [];
+  for (const patient of patients) {
+    const base = { case: patient.id, observed_outcome: patient.ground_truth?.label ?? "" };
+    out.push(...trajectoryRows(patient.points, base, patient.ground_truth, (point) =>
+      (point.kind === "day" ? `End of ${texts.day} ${point.day}` : imageCutoff(point.offset_seconds))));
+    for (const profile of patient.importance || []) {
+      for (const row of profile.rows) {
+        for (const [modelId, delta] of Object.entries(row.delta)) {
+          out.push({
+            section: "importance", ...base, cutoff: imageCutoff(profile.offset_seconds), cutoff_time: timeLabel(profile.offset_seconds),
+            model: modelById[modelId]?.name ?? modelId, event: row.label, score: delta,
+          });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function save(tableRows, filename) {
+  const lines = [COLUMNS.join(","), ...tableRows.map((row) => COLUMNS.map((column) => cell(row[column])).join(","))];
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
-  const link = Object.assign(document.createElement("a"), {
-    href: URL.createObjectURL(blob), download: `${state.patient.id.replace(/\W+/g, "-")}.csv`,
-  });
+  const link = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: filename });
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+function download() {
+  if (!state.patient) return showToast("Open a case first.");
+  save(rows(), `${state.patient.id.replace(/\W+/g, "-")}.csv`);
+}
+
+async function downloadStatistics() {
+  button.disabled = true;
+  try {
+    const tableRows = await statisticsRows();
+    if (!tableRows.length) return showToast("No case is computed yet: use Compute missing cases first.");
+    save(tableRows, "statistics.csv");
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    button.disabled = false;
+  }
 }

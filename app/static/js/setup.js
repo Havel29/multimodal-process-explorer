@@ -6,15 +6,17 @@ const fieldsForm = document.getElementById("setupFields");
 const message = document.getElementById("setupMessage");
 const step = document.getElementById("setupStep");
 const intro = document.getElementById("setupIntro");
-const openButton = document.getElementById("setupOpen");
 const continueButton = document.getElementById("setupContinue");
 let token = null;
 let listenersBound = false;
+let continueToExplorer = null;
 
+// The explorer opens on #explorer (Case view) or #statistics; the bare address shows the inputs.
 export const EXPLORER_HASH = "explorer";
+export const STATISTICS_HASH = "statistics";
 
-function enterExplorer() {
-  window.location.hash = EXPLORER_HASH;
+export function enterExplorer(page = EXPLORER_HASH) {
+  window.location.hash = page;
   window.location.reload();
 }
 
@@ -35,7 +37,7 @@ function showNotes(notes) {
   button.type = "button";
   button.className = "primary-button";
   button.textContent = "Open the explorer";
-  button.addEventListener("click", enterExplorer);
+  button.addEventListener("click", () => enterExplorer());
   message.append(intro, list, button);
   // The setup is already applied: the top button would only parse the data again. It comes back if a field changes.
   const submit = fieldsForm.querySelector("button[type=submit]");
@@ -108,7 +110,7 @@ function reset() {
   busy(fieldsForm, "");
 }
 
-function open() {
+export function open() {
   reset();
   wizard.classList.remove("hidden");
   document.getElementById("xesFile").focus();
@@ -117,8 +119,8 @@ function open() {
 function bindListeners() {
   if (listenersBound) return;
   listenersBound = true;
-  openButton.addEventListener("click", open);
-  continueButton.addEventListener("click", enterExplorer);
+  // Inside the explorer, "Continue" just goes back to the Case view; otherwise it opens the explorer
+  continueButton.addEventListener("click", () => (continueToExplorer ? continueToExplorer() : enterExplorer()));
 
   pathsForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -180,7 +182,7 @@ function bindListeners() {
       if (!Object.values(modelSelects).some((select) => select.value)) throw new Error("Select at least one model");
       const result = await api.applySetup(body);
       if (result.notes?.length) return showNotes(result.notes);
-      enterExplorer();
+      enterExplorer();  // a new setup always reloads the explorer
     } catch (error) {
       busy(fieldsForm, "");
       message.textContent = error.message;
@@ -188,8 +190,9 @@ function bindListeners() {
   });
 }
 
-export function init({ open: openAtStart = true, canContinue = false } = {}) {
+export function init({ open: openAtStart = true, canContinue = false, onContinue = null } = {}) {
   bindListeners();
+  continueToExplorer = onContinue;
   continueButton.classList.toggle("hidden", !canContinue);
   if (openAtStart) open();
 }
