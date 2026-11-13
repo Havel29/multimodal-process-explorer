@@ -1,5 +1,6 @@
 // Entry point: the Inputs page, or the explorer (#explorer, #statistics) on the data already loaded.
 import { api } from "./api.js";
+import { restoreShownClass } from "./config.js";
 import { selectPatient, showCaseView, showStatistics } from "./controller.js";
 import { state } from "./state.js";
 import * as analysis from "./views/analysis.js";
@@ -22,6 +23,7 @@ try {
   const exploring = status.configured && [setup.EXPLORER_HASH, setup.STATISTICS_HASH].includes(page);
   setup.init({ open: !exploring, canContinue: status.configured, onContinue: exploring ? showCaseView : null });
   if (exploring) {
+    restoreShownClass();  // the class chosen last time in this browser
     for (const view of [header, timeline, stage, knowledge, predictions, analysis, statistics, exportCsv, splitter, tour]) view.init();
     await runtime.init();
     state.patients = (await api.patients()).patients;

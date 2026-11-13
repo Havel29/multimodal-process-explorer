@@ -308,18 +308,30 @@ class DemoService:
             self._last_timing.clear()
 
     def _ablation(self, patient_id: str, known: Knowledge, enabled: set[str]) -> dict:
-        """Change in risk when one event type is removed, or the image blanked."""
+        """Change in each class probability when one event type is removed, or the image blanked.
+
+        "delta" is the change for the risk class; "deltas" has it for every class, so the page can
+        show the class the user picks."""
         risk = self.config.risk_class
         text_models = [
             spec.id for spec in self.config.models
             if spec.uses_text and (not spec.uses_image or known.image_event is not None)
         ]
 
-        def risk_of(model_id: str, ids: set[str], blank_image: bool = False) -> float:
+        def probabilities_of(model_id: str, ids: set[str], blank_image: bool = False) -> dict[str, float]:
             history, _ = compose_history(known.available, ids)
-            return self.probabilities(model_id, history, patient_id, known.image_event, blank_image)[risk]
+            return self.probabilities(model_id, history, patient_id, known.image_event, blank_image)
 
-        baseline = {model_id: risk_of(model_id, enabled) for model_id in text_models}
+        base = {model_id: probabilities_of(model_id, enabled) for model_id in text_models}
+        baseline = {model_id: base[model_id][risk] for model_id in text_models}
+
+        def row(key: str, label: str, count: int, changed: dict[str, dict[str, float]]) -> dict:
+            deltas = {
+                code: {model_id: round(values[code] - base[model_id][code], 6) for model_id, values in changed.items()}
+                for code in next(iter(changed.values()))
+            }
+            return {"key": key, "label": label, "event_count": count, "delta": deltas[risk], "deltas": deltas}
+
         groups: dict[str, tuple[str, set[str]]] = {}
         for event in known.available:
             if event["id"] in enabled:
@@ -327,25 +339,22 @@ class DemoService:
                 groups.setdefault(event_type.key, (event_type.label, set()))[1].add(event["id"])
 
         rows = [
-            {
-                "key": key, "label": label, "event_count": len(ids),
-                "delta": {model_id: round(risk_of(model_id, enabled - ids) - baseline[model_id], 6) for model_id in text_models},
-            }
+            row(key, label, len(ids), {model_id: probabilities_of(model_id, enabled - ids) for model_id in text_models})
             for key, (label, ids) in groups.items()
-        ]
+        ] if text_models else []
         multimodal = [spec.id for spec in self.config.models if spec.uses_text and spec.uses_image and spec.id in baseline]
         if multimodal:
-            rows.append({
-                "key": "image", "label": self.config.image_noun.capitalize(), "event_count": 1,
-                "delta": {model_id: round(risk_of(model_id, enabled, blank_image=True) - baseline[model_id], 6) for model_id in multimodal},
-            })
-        rows.sort(key=lambda row: max(abs(value) for value in row["delta"].values()), reverse=True)
+            rows.append(row("image", self.config.image_noun.capitalize(), 1,
+                            {model_id: probabilities_of(model_id, enabled, blank_image=True) for model_id in multimodal}))
+        rows.sort(key=lambda item: max(abs(value) for value in item["delta"].values()), reverse=True)
         return {"baseline": baseline, "rows": rows}
 
-    def explain(self, selection: Selection, scope: str = "context", model_id: str | None = None) -> dict:
-        """Run the explanation method configured for a model; positive scores push toward the risk class.
+    def explain(self, selection: Selection, scope: str = "context", model_id: str | None = None,
+                outcome: str | None = None) -> dict:
+        """Run the explanation method configured for a model; positive scores push toward ``outcome``.
 
         ``model_id`` picks the model (default: the main explanation, the multimodal one if there is one).
+        ``outcome`` is the class the scores point to (default: the risk class).
         "context" explains what the model reads, as in the paper. "history" explains the
         whole history window by window, so out-of-context events get scores too.
         """
@@ -354,7 +363,11 @@ class DemoService:
         settings = self.config.explanation_of(model_id) if model_id else self.config.explanation
         if settings is None:
             raise BadRequest(f"No explanation is configured for {model_id or 'any model'}")
-        key = (*selection.key(), scope, settings.model)
+        codes = [item.code for item in self.config.outcome_classes]
+        outcome = outcome or self.config.risk_class
+        if outcome not in codes:
+            raise BadRequest(f"Unknown outcome class {outcome!r}")
+        key = (*selection.key(), scope, settings.model, outcome)
         with self._explanations_lock:
             if key in self._explanations:
                 self._explanations.move_to_end(key)
@@ -374,9 +387,9 @@ class DemoService:
         options = settings.arguments()
         history, spans = compose_history(known.available, enabled)
         image_path = self.image_path(patient["id"], image_event["id"]) if image_event else None
-        # Two classes: explain the predicted one and flip the sign if it is not the risk class.
-        # More classes: explain the risk class itself, so that the colours keep meaning towards/away from it.
-        target = self.config.class_index(self.config.risk_class) if len(self.config.outcome_classes) > 2 else None
+        # Two classes: explain the predicted one and flip the sign if it is not the chosen class.
+        # More classes: explain the chosen class itself, so that the colours keep meaning towards/away from it.
+        target = self.config.class_index(outcome) if len(self.config.outcome_classes) > 2 else None
         try:
             result = explainer(model, history, image_path, target=target, **options)
             context = model.context_spans(history) if model.spec.uses_text else []
@@ -392,7 +405,7 @@ class DemoService:
         except ModelUnavailable as exc:
             raise Unavailable(str(exc)) from exc
 
-        sign = 1 if result.target == self.config.class_index(self.config.risk_class) else -1
+        sign = 1 if result.target == self.config.class_index(outcome) else -1
         events = event_attributions(history, spans, [(start, end, score * sign) for start, end, score in tokens])
         probabilities = {
             outcome.code: round(value, 6) for outcome, value in zip(self.config.outcome_classes, result.probabilities)
@@ -427,20 +440,23 @@ class DemoService:
                 selection.cutoff_seconds = point["offset_seconds"]
             _, known, _ = self.knowledge(selection)
             history, _ = compose_history(known.available, {event["id"] for event in known.available})
-            values, predicted = {}, {}
+            values, predicted, every_class = {}, {}, {}
             for spec in self.config.models:
                 if spec.uses_image and known.image_event is None:
-                    values[spec.id] = predicted[spec.id] = None
+                    values[spec.id] = predicted[spec.id] = every_class[spec.id] = None
                 else:
                     probabilities = self.probabilities(spec.id, history, patient["id"], known.image_event)
                     values[spec.id] = probabilities[risk]
                     predicted[spec.id] = max(probabilities, key=probabilities.get)  # any number of classes
+                    # Every class, so the page can show any of them
+                    every_class[spec.id] = {code: round(value, 6) for code, value in probabilities.items()}
             points.append({
                 **point,
                 "event_count": len(known.available),
                 "image_event_id": known.image_event["id"] if known.image_event else None,
                 "risk": values,
                 "predicted": predicted,
+                "probabilities": every_class,
             })
         return points
 

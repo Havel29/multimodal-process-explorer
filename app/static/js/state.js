@@ -10,6 +10,8 @@ export const state = {
   stayDays: 1,
   // { kind: "day" | "stage" | "free", seconds, day?, stageId? }
   cutoff: null,
+  zoom: null,  // the time window shown on the timeline, { start, end } in seconds; null: the whole case
+  query: "",  // the search over "Events given to the models"
   enabled: new Set(),
   focused: null,
   predicting: false,

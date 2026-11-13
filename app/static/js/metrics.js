@@ -1,14 +1,47 @@
 // Metrics over the prediction lines. A prediction is the most probable class (any number of classes);
-// AUC and Brier score compare the risk outcome against all the others.
-import { config, models, otherOutcome } from "./config.js";
+// AUC and Brier score compare the class shown on the page against all the others.
+import { config, configuredOther, configuredRisk, models, riskOutcome } from "./config.js";
 
 /** The class a model predicts at a point (older points without "predicted": two classes, p(risk) >= 0.5). */
 export function predictedClass(point, model) {
   const stored = point.predicted?.[model];
   if (stored) return stored;
   const risk = point.risk[model];
-  return risk === null || risk === undefined ? null : risk >= 0.5 ? config.riskClass : otherOutcome.code;
+  return risk === null || risk === undefined ? null : risk >= 0.5 ? configuredRisk : configuredOther.code;
 }
+
+/**
+ * The probability a model gives one class at a point: null where the model cannot run, undefined
+ * where it is not stored (lines computed before every class was kept, with more than two classes).
+ */
+export function classProbability(point, model, code) {
+  const risk = point.risk[model];
+  if (risk === null || risk === undefined) return null;
+  const stored = point.probabilities?.[model]?.[code];
+  if (stored !== undefined) return stored;
+  if (code === configuredRisk) return risk;
+  return config.outcomes.length === 2 ? 1 - risk : undefined;
+}
+
+/** The probability of the class shown on the page. */
+export const probability = (point, model) => classProbability(point, model, riskOutcome.code);
+
+/** Whether some line lacks the shown class, which then needs computing again. */
+export const missingShownClass = (points) => (points || []).some((point) =>
+  models.some((model) => probability(point, model.id) === undefined));
+
+/** The change in one class's probability in a row of the event-type importance (as classProbability). */
+export function classDelta(row, model, code) {
+  const stored = row.deltas?.[code]?.[model];
+  if (stored !== undefined) return stored;
+  const delta = row.delta?.[model];
+  if (delta === undefined) return undefined;
+  if (code === configuredRisk) return delta;
+  return config.outcomes.length === 2 ? -delta : undefined;
+}
+
+/** The change in the shown class's probability. */
+export const importanceDelta = (row, model) => classDelta(row, model, riskOutcome.code);
 
 export const isCorrect = (point, model, truth) => predictedClass(point, model) === truth;
 
@@ -39,10 +72,12 @@ export function agreement(points) {
   return shared.length ? { agree: agree.length, total: shared.length } : null;
 }
 
+const scored = (pairs) => pairs.filter((pair) => pair.p !== undefined && pair.p !== null);
+
 /** ROC AUC by pairwise comparison (Mann-Whitney); null without both classes. */
 export function auc(pairs) {
-  const positives = pairs.filter((pair) => pair.y === 1);
-  const negatives = pairs.filter((pair) => pair.y === 0);
+  const positives = scored(pairs).filter((pair) => pair.y === 1);
+  const negatives = scored(pairs).filter((pair) => pair.y === 0);
   if (!positives.length || !negatives.length) return null;
   let wins = 0;
   for (const positive of positives) {
@@ -66,14 +101,17 @@ export function macroF1(pairs) {
 }
 
 /** Brier score: mean squared gap between the predicted probability and the outcome (0 or 1). */
-export const brier = (pairs) => (pairs.length ? pairs.reduce((sum, pair) => sum + (pair.p - pair.y) ** 2, 0) / pairs.length : null);
+export function brier(pairs) {
+  const values = scored(pairs);
+  return values.length ? values.reduce((sum, pair) => sum + (pair.p - pair.y) ** 2, 0) / values.length : null;
+}
 
-/** Risk probability, risk outcome (1/0), predicted and observed class over patients, for one model,
- *  at the points chosen by `pick`. */
+/** Probability of the shown class, whether it is the observed one (1/0), predicted and observed class
+ *  over patients, for one model, at the points chosen by `pick`. */
 export function pairs(patients, model, pick = (points) => points) {
   return patients.flatMap((patient) =>
     series(pick(patient.points), model).map((point) => ({
-      p: point.risk[model], y: patient.isRisk ? 1 : 0,
+      p: probability(point, model), y: patient.ground_truth.code === riskOutcome.code ? 1 : 0,
       predicted: predictedClass(point, model), truth: patient.ground_truth.code,
     })),
   );

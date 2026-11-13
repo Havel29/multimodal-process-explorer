@@ -3,20 +3,25 @@
 // The section column says what a row is:
 //   prediction   each model's prediction at the current cutoff (the Predictions panel)
 //   trajectory   each point of the prediction lines under the timeline
-//   explanation  each event's score in the last explanation (the Why? panel), if one was run
-//   importance   (Statistics) at each image cutoff, the change in the risk probability when every event
-//                of that type is removed (score; for the image models, the image is blanked)
+//   explanation  each event's score in the last explanation (the Why? panel), if one was run; positive
+//                scores push toward the class shown on the page
+//   importance   (Statistics) at each image cutoff, the change in each class probability (delta_<class>)
+//                when every event of that type is removed (for the image models, the image is blanked);
+//                score is the change for the class shown on the page
+// A column only belongs to some sections, so the others leave it empty: device and inference time
+// exist only for predictions, event and score only for explanations and importance.
 import { api } from "./api.js";
-import { capitalized, config, displayName, imageNoun, models, modelById, riskOutcome, texts } from "./config.js";
-import { predictedClass } from "./metrics.js";
+import { capitalized, config, displayName, imageNoun, models, modelById, texts } from "./config.js";
+import { classDelta, classProbability, importanceDelta, predictedClass } from "./metrics.js";
 import { timeLabel } from "./format.js";
 import { availableEvents, cutoffLabel, eventById, state } from "./state.js";
 import { showToast } from "./views/toast.js";
 
 const button = document.getElementById("exportCsv");
 const probabilityColumns = config.outcomes.map((outcome) => `p_${outcome.code}`);
+const deltaColumns = config.outcomes.map((outcome) => `delta_${outcome.code}`);
 const COLUMNS = ["section", "case", "observed_outcome", "cutoff", "cutoff_time", "events_given", "model", "predicted",
-  ...probabilityColumns, "matches_observed", "device", "inference_ms", "event", "event_time", "score"];
+  ...probabilityColumns, "matches_observed", "device", "inference_ms", "event", "event_time", "score", ...deltaColumns];
 
 export function init() {
   button.addEventListener("click", () => (state.view === "statistics" ? downloadStatistics() : download()));
@@ -33,8 +38,11 @@ function trajectoryRows(points, base, truth, where) {
       const code = predictedClass(point, model.id);
       const predicted = config.outcomes.find((outcome) => outcome.code === code) || { code, label: code };
       out.push({
-        section: "trajectory", ...base, cutoff: where(point), cutoff_time: timeLabel(point.offset_seconds), model: model.name,
-        predicted: predicted.label, [`p_${riskOutcome.code}`]: risk,
+        section: "trajectory", ...base, cutoff: where(point), cutoff_time: timeLabel(point.offset_seconds),
+        // Every event known at a point of the lines is given to the models
+        events_given: point.event_count ? `${point.event_count} of ${point.event_count}` : "",
+        model: model.name, predicted: predicted.label,
+        ...Object.fromEntries(config.outcomes.map((outcome) => [`p_${outcome.code}`, classProbability(point, model.id, outcome.code)])),
         matches_observed: truth ? predicted.code === truth.code : "",
       });
     }
@@ -97,10 +105,11 @@ async function statisticsRows() {
       (point.kind === "day" ? `End of ${texts.day} ${point.day}` : imageCutoff(point.offset_seconds))));
     for (const profile of patient.importance || []) {
       for (const row of profile.rows) {
-        for (const [modelId, delta] of Object.entries(row.delta)) {
+        for (const modelId of Object.keys(row.delta)) {
           out.push({
             section: "importance", ...base, cutoff: imageCutoff(profile.offset_seconds), cutoff_time: timeLabel(profile.offset_seconds),
-            model: modelById[modelId]?.name ?? modelId, event: row.label, score: delta,
+            model: modelById[modelId]?.name ?? modelId, event: row.label, score: importanceDelta(row, modelId),
+            ...Object.fromEntries(config.outcomes.map((outcome) => [`delta_${outcome.code}`, classDelta(row, modelId, outcome.code)])),
           });
         }
       }

@@ -63,7 +63,8 @@ async function run(modelId) {
     ? ", then over every earlier part of the history. This takes about half a minute per part on CPU."
     : ". This takes about half a minute on CPU."}</p>`;
   try {
-    const result = await api.explain(selectionBody(), scope, modelId);
+    // Positive scores push toward the class shown on the page
+    const result = await api.explain(selectionBody(), scope, modelId, riskOutcome.code);
     if (token !== state.analysisToken) return;
     state.explanation = result;
     renderExplanation(result);
@@ -81,7 +82,8 @@ async function run(modelId) {
   }
 }
 
-const direction = `Bars point <span class="toward-risk-text">right, toward ${escapeHtml(riskOutcome.short)}</span>, or
+// A function: the class shown can change
+const direction = () => `Bars point <span class="toward-risk-text">right, toward ${escapeHtml(riskOutcome.short)}</span>, or
   <span class="away-from-risk-text">left, away from it</span>.`;
 
 function scopeNote(result) {
@@ -154,7 +156,7 @@ function renderExplanation(result) {
       ${divergingBar(entry.score, largest)}</button>`;
   }).join("");
   els.result.innerHTML = `
-    <p>${escapeHtml(modelById[result.model].name)} predicts <strong>${escapeHtml(result.prediction.label)}</strong> (${percent(result.probabilities[result.prediction.code])}). ${direction}</p>
+    <p>${escapeHtml(modelById[result.model].name)} predicts <strong>${escapeHtml(result.prediction.label)}</strong> (${percent(result.probabilities[result.prediction.code])}). ${direction()}</p>
     <h3>${escapeHtml(texts.history_title)}</h3>
     <div class="attr-list">${rows || '<p class="empty-note">No event text inside the model context.</p>'}</div>
     ${scopeNote(result)}

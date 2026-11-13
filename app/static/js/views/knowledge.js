@@ -1,7 +1,7 @@
-// The list of events known at the cutoff, with a checkbox per event.
+// The list of events known at the cutoff, with a checkbox per event and a search over them.
 import { displayName, eventTypeOf, revealsOutcome, texts } from "../config.js";
 import { toggleEvents } from "../controller.js";
-import { clock, dayOf, escapeHtml, plural } from "../format.js";
+import { clock, dayOf, escapeHtml, plural, timeLabel } from "../format.js";
 import { availableEvents, state } from "../state.js";
 import { divergingBar } from "./bars.js";
 
@@ -10,22 +10,49 @@ const els = {
   list: document.getElementById("knowledgeList"),
   enableAll: document.getElementById("enableAll"),
   disableAll: document.getElementById("disableAll"),
+  search: document.getElementById("knowledgeSearch"),
 };
+
+/** The words searched: an event matches when its name, time or text contains all of them. */
+const terms = () => state.query.toLowerCase().split(/\s+/).filter(Boolean);
+const searchable = (event) =>
+  `${displayName(event)} ${event.activity} ${timeLabel(event.offset_seconds)} ${event.summary} ${event.model_text}`.toLowerCase();
+
+/** The events listed: every known event, or those matching the search. */
+export function listedEvents() {
+  const words = terms();
+  const available = availableEvents();
+  return words.length ? available.filter((event) => words.every((word) => searchable(event).includes(word))) : available;
+}
 
 export function init() {
   els.list.addEventListener("change", (event) => {
     const item = event.target.closest("[data-knowledge]");
     if (item) toggleEvents([item.dataset.knowledge], event.target.checked);
   });
-  els.enableAll.addEventListener("click", () => toggleEvents(availableEvents().map((event) => event.id), true));
-  els.disableAll.addEventListener("click", () => toggleEvents(availableEvents().map((event) => event.id), false));
+  // With a search, Select all and Clear act on the events listed
+  els.enableAll.addEventListener("click", () => toggleEvents(listedEvents().map((event) => event.id), true));
+  els.disableAll.addEventListener("click", () => toggleEvents(listedEvents().map((event) => event.id), false));
+  els.search.addEventListener("input", () => {
+    state.query = els.search.value;
+    render();
+  });
 }
 
 export function render() {
   const available = availableEvents();
-  els.count.textContent = available.length ? `${state.enabled.size} of ${available.length} selected` : "";
+  const listed = listedEvents();
+  const searching = terms().length > 0;
+  els.count.textContent = available.length
+    ? `${state.enabled.size} of ${available.length} selected${searching ? `; ${listed.length} match` : ""}` : "";
+  els.enableAll.title = searching ? "Select the events that match the search" : "Select every event";
+  els.disableAll.title = searching ? "Clear the events that match the search" : "Clear every event";
   if (!available.length) {
     els.list.innerHTML = `<p class="empty-note">${escapeHtml(texts.events_empty)}</p>`;
+    return;
+  }
+  if (!listed.length) {
+    els.list.innerHTML = `<p class="empty-note">No event matches "${escapeHtml(state.query.trim())}".</p>`;
     return;
   }
 
@@ -33,11 +60,11 @@ export function render() {
   const outside = new Set(explanation?.out_of_context_event_ids || []);
   const largest = explanation ? Math.max(...Object.values(explanation.events).map((entry) => Math.abs(entry.score))) : 1;
   const perDay = new Map();
-  for (const event of available) perDay.set(dayOf(event.offset_seconds), (perDay.get(dayOf(event.offset_seconds)) || 0) + 1);
+  for (const event of listed) perDay.set(dayOf(event.offset_seconds), (perDay.get(dayOf(event.offset_seconds)) || 0) + 1);
 
   let currentDay = null;
   const rows = [];
-  for (const event of available) {
+  for (const event of listed) {
     const day = dayOf(event.offset_seconds);
     if (day !== currentDay) {
       rows.push(`<div class="knowledge-day">${texts.day} ${day}, ${plural(perDay.get(day), "event")}</div>`);

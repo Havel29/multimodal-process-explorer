@@ -1,6 +1,6 @@
 // User actions. Each one updates the state, then re-renders the views it affects.
 import { api } from "./api.js";
-import { DAY, eventTypeOf, models } from "./config.js";
+import { DAY, eventTypeOf, models, setShownClass } from "./config.js";
 import * as setup from "./setup.js";
 import { availableEvents, endCutoff, imageEvent, selectionBody, state } from "./state.js";
 import * as analysis from "./views/analysis.js";
@@ -52,7 +52,7 @@ export async function selectPatient(patientId) {
     const patient = await api.patient(patientId);
     if (token !== patientSelectionToken) return;
     Object.assign(state, {
-      patient, cutoff: null, focused: null, enabled: new Set(),
+      patient, cutoff: null, zoom: null, focused: null, enabled: new Set(),
       predicting: false, trajectory: null, trajectoryLoading: true,
       stayDays: Math.max(1, Math.ceil(patient.duration_seconds / DAY)),
     });
@@ -95,6 +95,17 @@ export async function showStatistics() {
   leaveCaseView();
   showPage("statistics");
   await statistics.show();
+}
+
+/** Show another class: the charts and statistics are drawn again, a running explanation is dropped. */
+export function showClass(code) {
+  if (!setShownClass(code)) return;
+  analysis.clear();
+  if (state.patient) {
+    renderAll();
+    header.renderInsights();
+  }
+  if (state.view === "statistics") statistics.rerender();
 }
 
 export function showInputs() {

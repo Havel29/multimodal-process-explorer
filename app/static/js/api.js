@@ -38,7 +38,7 @@ export const api = {
   statistics: () => request("/api/statistics"),
   resetStatistics: () => request("/api/statistics", { method: "DELETE" }),
   predict: (selection, model) => post("/api/predict", { ...selection, model }),
-  explain: (selection, scope = "context", model = null) => post("/api/explain", { ...selection, scope, model }),
+  explain: (selection, scope = "context", model = null, outcome = null) => post("/api/explain", { ...selection, scope, model, outcome }),
 };
 
 function post(url, body) {

@@ -61,6 +61,15 @@ def test_importance_reports_the_change_in_risk_per_event_type(client):
     assert deltas["image"] == {"flava": -0.1}
 
 
+def test_importance_has_the_change_of_every_class(client):
+    body = client.get("/api/patients/Patient 01/importance?compute=true").json()["stages"][0]
+
+    for row in body["rows"]:
+        assert row["deltas"]["non_survival"] == row["delta"]  # the risk class
+        for model, delta in row["delta"].items():
+            assert row["deltas"]["home"][model] == -delta  # two classes: the other moves the opposite way
+
+
 EXPLAIN_AT_XRAY = {"patient_id": "Patient 01", "stage_event_id": "E003", "enabled_event_ids": ["E001", "E002", "E003"]}
 
 
@@ -82,6 +91,16 @@ def test_whole_history_explanation_scores_every_event_window_by_window(client):
     assert body["patches"] == [[0.5]]
 
 
+def test_explanation_points_toward_the_chosen_class(client):
+    toward_risk = client.post("/api/explain", json=EXPLAIN_AT_XRAY).json()
+    toward_home = client.post("/api/explain", json={**EXPLAIN_AT_XRAY, "outcome": "home"}).json()
+
+    for event_id, entry in toward_risk["events"].items():
+        assert toward_home["events"][event_id]["score"] == -entry["score"]
+    assert toward_home["patches"] == [[-value for value in row] for row in toward_risk["patches"]]
+    assert client.post("/api/explain", json={**EXPLAIN_AT_XRAY, "outcome": "unknown"}).status_code == 400
+
+
 def test_unknown_explanation_scope_is_rejected(client):
     assert client.post("/api/explain", json={**EXPLAIN_AT_XRAY, "scope": "everything"}).status_code == 400
 
@@ -94,6 +113,11 @@ def test_trajectory_runs_to_the_end_of_the_stay(client):
     assert points[0]["risk"]["vit"] is None
     assert points[-1]["risk"]["vit"] is not None
     assert points[-1]["predicted"]["vit"] in {"non_survival", "home"} and points[0]["predicted"]["vit"] is None
+    # Every class, so that the page can show any of them
+    assert points[0]["probabilities"]["vit"] is None
+    last = points[-1]["probabilities"]["vit"]
+    assert set(last) == {"non_survival", "home"} and abs(sum(last.values()) - 1) < 1e-5
+    assert last["non_survival"] == round(points[-1]["risk"]["vit"], 6)
 
 
 def test_events_that_state_the_outcome_are_never_given_to_the_models(config, service):

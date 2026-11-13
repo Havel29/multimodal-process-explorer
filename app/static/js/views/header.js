@@ -1,6 +1,6 @@
 // Tabs, case navigation, title, observed outcome, and summary chips.
-import { config, imageNoun, models, stageNoun, texts, fill, nouns } from "../config.js";
-import { selectPatient, showCaseView, showInputs, showStatistics } from "../controller.js";
+import { config, imageNoun, models, riskOutcome, stageNoun, texts, fill, nouns } from "../config.js";
+import { selectPatient, showCaseView, showClass, showInputs, showStatistics } from "../controller.js";
 import { escapeHtml, plural, timeLabel } from "../format.js";
 import { agreement, flips, series, settlesFrom } from "../metrics.js";
 import { state } from "../state.js";
@@ -15,6 +15,8 @@ const els = {
   nextPatient: document.getElementById("nextPatient"),
   exportCsv: document.getElementById("exportCsv"),
   device: document.getElementById("deviceSelect"),
+  classControl: document.getElementById("classControl"),
+  classSelect: document.getElementById("classSelect"),
   help: document.getElementById("helpButton"),
   title: document.getElementById("patientTitle"),
   meta: document.getElementById("patientMeta"),
@@ -35,6 +37,16 @@ export function init() {
   els.patientSelect.addEventListener("change", () => selectPatient(els.patientSelect.value));
   els.previousPatient.addEventListener("click", () => movePatient(-1));
   els.nextPatient.addEventListener("click", () => movePatient(1));
+  els.classSelect.addEventListener("change", () => showClass(els.classSelect.value));
+  fillClasses();
+}
+
+/** The class selector: every outcome class, starting at the one shown (the risk class by default). */
+function fillClasses() {
+  els.classSelect.innerHTML = config.outcomes.map((outcome) =>
+    `<option value="${escapeHtml(outcome.code)}">${escapeHtml(outcome.label)}</option>`).join("");
+  els.classSelect.value = riskOutcome.code;
+  els.classControl.classList.toggle("hidden", config.outcomes.length < 2);
 }
 
 /**
@@ -50,7 +62,8 @@ export function initSetupPage(configured, openExplorer) {
   }
   els.inputsTab.classList.add("active");
   els.inputsTab.setAttribute("aria-current", "page");
-  for (const control of [els.exportCsv, els.device, els.help]) {
+  fillClasses();
+  for (const control of [els.exportCsv, els.device, els.help, els.classSelect]) {
     control.disabled = true;
     control.title = "Available once the explorer is open";
   }

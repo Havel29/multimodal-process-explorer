@@ -13,6 +13,7 @@
   --highlight: #f2c14e;
   --lane-height: 22px;
   --axis-height: 38px;
+  --overview-height: 30px;
   --chart-height: 84px;
 }
 
@@ -120,7 +121,9 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .chart-label { display: block; height: var(--chart-height); padding-top: 4px; line-height: 1.25; }
 .chart-label small { display: block; color: var(--faint); font-size: 11px; font-weight: 500; }
 .lane { position: relative; height: var(--lane-height); border-bottom: 1px solid var(--hairline); cursor: crosshair; }
-.plot-under, .plot-over { position: absolute; top: 0; bottom: var(--axis-height); left: var(--label-width); right: 0; pointer-events: none; }
+.plot-under, .plot-over { position: absolute; top: 0; bottom: calc(var(--axis-height) + var(--overview-height)); left: var(--label-width); right: 0; pointer-events: none; }
+/* Zoomed in, whatever falls outside the time window is cut off at the sides */
+.plot-under, .lane, .chart, .axis { overflow-x: clip; }
 .plot-under { z-index: 0; }
 .plot-over { z-index: 3; }
 .plot-over .cutoff-line, .plot-over .brush-menu { pointer-events: auto; }
@@ -139,6 +142,20 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .mark.image-event.off { color: var(--c); }
 .mark.image-event.selected { outline: 3px solid var(--highlight); outline-offset: 1px; z-index: 4; }
 .axis { position: relative; height: var(--axis-height); }
+.hour-label { position: absolute; top: 11px; transform: translateX(-50%); color: var(--faint); font-size: 11px; font-weight: 500; white-space: nowrap; pointer-events: none; }
+/* Zoom buttons and the browse bar: the whole case, with the window shown as a box */
+.zoom-tools { display: flex; align-items: center; gap: 4px; height: var(--overview-height); }
+.zoom-tools button { min-width: 26px; height: 22px; padding: 0 6px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; }
+.zoom-tools button:hover:not(:disabled) { border-color: var(--accent); }
+.zoom-tools button:disabled { color: var(--faint); cursor: default; }
+.overview { position: relative; height: 18px; margin: 6px 0; background: var(--canvas); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.overview i { position: absolute; top: 3px; bottom: 3px; width: 1px; opacity: .75; }
+.overview .overview-cutoff { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--navy); }
+.overview-window { position: absolute; top: 0; bottom: 0; background: rgba(44, 111, 153, .12); border: 2px solid var(--accent); border-radius: 3px; }
+.overview:not(.zoomed) .overview-window { border-color: transparent; background: none; }
+.overview.zoomed { cursor: grab; }
+.swimlanes.dragging .overview, .overview.zoomed:active { cursor: grabbing; }
+.overview-note { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink); background: rgba(255, 248, 230, .85); font-size: 11px; font-weight: 600; pointer-events: none; }
 .axis-side { display: flex; align-items: flex-start; padding-top: 6px; }
 .jump-end { padding: 4px 8px; color: var(--navy); background: #fff; border: 1px solid var(--navy); border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .jump-end:hover:not(:disabled) { color: #fff; background: var(--navy); }
@@ -177,6 +194,8 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .heatmap-toggle { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--muted); font-size: 12px; }
 
 .knowledge-actions { display: flex; gap: 6px; margin-bottom: 8px; }
+.knowledge-actions input { flex: 1; min-width: 0; padding: 4px 8px; background: #fff; border: 1px solid var(--line); border-radius: 5px; font: inherit; font-size: 12px; }
+.knowledge-actions input:focus { border-color: var(--accent); outline: none; }
 .knowledge-list { flex: 1; min-height: 0; overflow-y: auto; border-top: 1px solid var(--line); }
 .knowledge-day { position: sticky; top: 0; padding: 6px 2px; color: var(--muted); background: #fff; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 700; z-index: 1; }
 .knowledge-item { display: grid; grid-template-columns: 18px 46px minmax(0, 1fr); gap: 8px; align-items: start; padding: 6px 2px; border-bottom: 1px solid #f0f3f5; cursor: pointer; font-size: 13px; }

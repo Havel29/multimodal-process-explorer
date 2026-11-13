@@ -19,9 +19,19 @@ export const modelById = Object.fromEntries(models.map((model) => [model.id, mod
 // Before the setup a configuration may have no outcome classes yet: they come from the event log
 const PLACEHOLDER_RISK = { code: "", label: "risk outcome", short: "risk", color: "#e34948" };
 const PLACEHOLDER_OTHER = { code: "", label: "other outcome", short: "other", color: "#2a78d6" };
-export const riskOutcome = config.outcomes.find((outcome) => outcome.code === config.riskClass) || PLACEHOLDER_RISK;
-export const otherOutcome = config.outcomes.find((outcome) => outcome.code !== config.riskClass) || PLACEHOLDER_OTHER;
-export const riskLabel = `P(${riskOutcome.short})`;
+const outcomeOf = (code) => config.outcomes.find((outcome) => outcome.code === code);
+const otherThan = (code) => config.outcomes.find((outcome) => outcome.code !== code);
+
+/** The risk class of the configuration (by default the rarest): what the server computed "risk" for. */
+export const configuredRisk = config.riskClass;
+/** The other class of the configuration, for prediction lines saved before the predicted class was stored. */
+export const configuredOther = otherThan(configuredRisk) || PLACEHOLDER_OTHER;
+
+// The class whose probability the charts, statistics and explanations show. It starts at the
+// configured risk class and can be changed from the page (setShownClass); the bindings are live.
+export let riskOutcome = outcomeOf(configuredRisk) || PLACEHOLDER_RISK;
+export let otherOutcome = otherThan(configuredRisk) || PLACEHOLDER_OTHER;
+export let riskLabel = `P(${riskOutcome.short})`;
 
 export function eventTypeOf(activity) {
   return activities.get(activity)?.type || otherType;
@@ -45,8 +55,38 @@ export function rgb(hex) {
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
 }
 
-export const riskRgb = rgb(riskOutcome.color);
-export const safeRgb = rgb(otherOutcome.color);
+export let riskRgb = rgb(riskOutcome.color);
+export let safeRgb = rgb(otherOutcome.color);
+
+const SHOWN_CLASS_KEY = "explorer.shownClass";
+
+/** Show another class: its probability on the charts and statistics, and explanations toward it. */
+export function setShownClass(code) {
+  const outcome = outcomeOf(code);
+  if (!outcome) return false;
+  riskOutcome = outcome;
+  otherOutcome = otherThan(code) || PLACEHOLDER_OTHER;
+  riskLabel = `P(${riskOutcome.short})`;
+  riskRgb = rgb(riskOutcome.color);
+  safeRgb = rgb(otherOutcome.color);
+  document.documentElement.style.setProperty("--risk", `var(--outcome-${code})`);
+  try {
+    localStorage.setItem(SHOWN_CLASS_KEY, code);
+  } catch (_) {
+    // Private windows may refuse storage; the choice then lasts until a reload
+  }
+  return true;
+}
+
+/** The class chosen last time in this browser, if the data still has it. */
+export function restoreShownClass() {
+  try {
+    const saved = localStorage.getItem(SHOWN_CLASS_KEY);
+    if (saved && saved !== riskOutcome.code) setShownClass(saved);
+  } catch (_) {
+    // Nothing saved
+  }
+}
 
 /** The texts of the interface ([texts] in the configuration) and the nouns they use. */
 export const texts = config.texts;

@@ -1,7 +1,8 @@
-// Timeline: lanes, cutoff line, risk chart, and mouse gestures.
+// Timeline: lanes, cutoff line, prediction chart, zoom with the browse bar, and mouse gestures.
 import { DAY, config, displayName, eventTypeOf, models, riskLabel, shortName, stageNoun, texts } from "../config.js";
 import { focusEvent, loadTrajectory, setCutoff, setEventType, setKnowledge } from "../controller.js";
 import { escapeHtml, percent, plural, timeLabel } from "../format.js";
+import { missingShownClass, probability } from "../metrics.js";
 import { atEnd, availableEvents, cutoffLabel, dayCutoff, endCutoff, eventById, stageCutoff, state } from "../state.js";
 
 const SNAP_PIXELS = 9;
@@ -13,6 +14,12 @@ const MAX_VISIBLE_LANES = 10;
 const MAX_NAMED_LANES = 3;
 // Enough horizontal room for a complete "Day 00" tick without overlap.
 const MIN_DAY_TICK_WIDTH = 56;
+// Zoom: each step halves or doubles the time shown, down to two hours.
+const ZOOM_STEP = 2;
+const MIN_SPAN = 2 * 3600;
+// Marks closer than this many pixels overlap: the browse bar then suggests zooming in.
+const CROWDED_PIXELS = 4;
+const HOUR = 3600;
 
 const container = document.getElementById("swimlanes");
 const detail = document.getElementById("eventDetail");
@@ -20,8 +27,19 @@ let drag = null;
 let brushIds = null;
 let visibleTypes = [];
 
-const fraction = (seconds) => seconds / (state.stayDays * DAY);
+/** The whole stay, in seconds. */
+const total = () => state.stayDays * DAY;
+/** The time window shown: the whole stay unless zoomed in (state.zoom). */
+const view = () => state.zoom || { start: 0, end: total() };
+const fraction = (seconds) => {
+  const { start, end } = view();
+  return (seconds - start) / (end - start);
+};
 const position = (seconds) => `${fraction(seconds) * 100}%`;
+const inView = (seconds) => {
+  const { start, end } = view();
+  return seconds >= start && seconds <= end;
+};
 // The layer above the lanes and the chart: geometry, cutoff line and box selection live here.
 const plot = () => container.querySelector(".plot-over");
 // Labels of cutoffs close to the right edge go on the left of the line.
@@ -34,6 +52,11 @@ export function init() {
   container.addEventListener("pointercancel", onPointerUp);
   container.addEventListener("keydown", onKeyDown);
   container.addEventListener("click", onClick);
+  container.addEventListener("dblclick", (event) => {
+    if (event.target.closest(".overview")) setZoom(null);
+  });
+  // Ctrl + scroll zooms around the pointer; a sideways scroll (or Shift + scroll) moves the window
+  container.addEventListener("wheel", onWheel, { passive: false });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeBrush();
   });
@@ -61,7 +84,7 @@ export function render() {
     const action = off ? "add these events back" : "remove these events";
     const toggle = `<button class="lane-toggle ${off ? "off" : ""}" data-lane="${type.key}" type="button" aria-pressed="${!off}"
       title="${escapeHtml(type.label)}: click to ${action}"><i style="background: var(--lane-${type.key})"></i><span>${escapeHtml(type.label)}</span></button>`;
-    const marks = events.filter((event) => eventTypeOf(event.activity) === type).map((event) => {
+    const marks = events.filter((event) => eventTypeOf(event.activity) === type && inView(event.offset_seconds)).map((event) => {
       const off = known.has(event.id) && !state.enabled.has(event.id) ? "off" : "";
       const note = outside.has(event.id) ? ". Out of context: outside the 512 tokens the text models read" : "";
       const title = escapeHtml(`${displayName(event)}, ${timeLabel(event.offset_seconds)}${note}`);
@@ -91,61 +114,169 @@ export function render() {
     <span class="axis-side"><button class="jump-end" data-jump-end type="button" ${atEnd() ? "disabled" : ""}
       title="Move the cutoff to the last event and give the models every event of the case">Jump to end</button></span>
     <div class="axis">${axis()}</div>
+    ${browseBar()}
     <div class="plot-over">${cutoffLine()}</div>`;
   container.querySelector(".lane-scroll").scrollTop = scrollTop;
 }
 
 function dayBands() {
   return Array.from({ length: state.stayDays }, (_, index) =>
-    (index % 2 ? `<div class="day-band" style="left: ${position(index * DAY)}; width: ${position(DAY)}"></div>` : "")
+    (index % 2 ? `<div class="day-band" style="left: ${position(index * DAY)}; width: ${(DAY / (view().end - view().start)) * 100}%"></div>` : "")
     + `<div class="day-line" style="left: ${position(index * DAY)}"></div>`).join("");
 }
 
 function axis() {
+  const { start, end } = view();
   const plotWidth = Math.max(320, container.clientWidth - 124);
-  const step = Math.max(1, Math.ceil((state.stayDays * MIN_DAY_TICK_WIDTH) / plotWidth));
+  const shownDays = (end - start) / DAY;
+  const step = Math.max(1, Math.ceil((shownDays * MIN_DAY_TICK_WIDTH) / plotWidth));
   const activeDay = state.cutoff?.kind === "day" ? state.cutoff.day : null;
-  const anchors = [1, state.stayDays, activeDay].filter(Boolean);
+  const visibleDay = (day) => (day - 0.5) * DAY >= start && (day - 0.5) * DAY <= end;
+  const firstDay = Math.max(1, Math.ceil(start / DAY + 0.5));
+  const lastDay = Math.min(state.stayDays, Math.floor(end / DAY + 0.5));
+  const anchors = [firstDay, lastDay, activeDay].filter((day) => day && visibleDay(day));
   const shown = new Set(anchors);
-  for (let day = 1; day <= state.stayDays; day += step) {
+  for (let day = firstDay; day <= lastDay; day += step) {
     if (!anchors.some((anchor) => anchor !== day && Math.abs(anchor - day) < step)) shown.add(day);
   }
-  return [...shown].sort((a, b) => a - b).map((day) => {
-    const left = position((day - 0.5) * DAY);
+  const days = [...shown].filter(visibleDay).sort((a, b) => a - b).map((day) => {
     const active = state.cutoff?.kind === "day" && state.cutoff.day === day;
-    return `<button class="day-button ${active ? "active" : ""}" style="left: ${left}" data-day="${day}" type="button"
+    return `<button class="day-button ${active ? "active" : ""}" style="left: ${position((day - 0.5) * DAY)}" data-day="${day}" type="button"
       aria-pressed="${active}" title="Predict with everything known by the end of ${texts.day} ${day}">${texts.day} ${day}</button>`;
   }).join("");
+  return days + hourTicks(shownDays, plotWidth);
+}
+
+/** When a few days or less are shown, hour labels between the day buttons. */
+function hourTicks(shownDays, plotWidth) {
+  if (shownDays > 3) return "";
+  const { start, end } = view();
+  const pixelsPerHour = plotWidth / ((end - start) / HOUR);
+  const every = [1, 2, 3, 6, 12].find((hours) => hours * pixelsPerHour >= 64) || 12;
+  const labels = [];
+  for (let at = Math.ceil(start / (every * HOUR)) * every * HOUR; at <= end; at += every * HOUR) {
+    const hour = Math.round((at % DAY) / HOUR);
+    // Midday sits under the day button; midnight is the day line
+    if (hour === 0 || hour === 12) continue;
+    labels.push(`<span class="hour-label" style="left: ${position(at)}">${String(hour).padStart(2, "0")}:00</span>`);
+  }
+  return labels.join("");
 }
 
 function cutoffLine() {
   if (!state.cutoff) return "";
+  const share = Math.min(1, Math.max(0, fraction(state.cutoff.seconds)));
+  const future = `<div class="future" style="left: ${share * 100}%"></div>`;
+  if (!inView(state.cutoff.seconds)) return future;  // outside the window: only the shade of what the models do not see
   const at = position(state.cutoff.seconds);
   const label = escapeHtml(cutoffLabel(state.cutoff));
-  return `<div class="future" style="left: ${at}"></div>
+  return `${future}
     <div class="cutoff-line ${nearEnd(state.cutoff) ? "near-end" : ""}" style="left: ${at}" tabindex="0" role="slider" aria-label="Prediction cutoff" aria-valuetext="${label}"><span>${label}</span></div>`;
 }
 
-/** The risk probability of every model at every cutoff, to the end of the stay. */
+/** The probability of the shown class for every model at every cutoff, to the end of the stay. */
 function chart() {
   if (state.trajectoryLoading) return '<div class="chart-message">Computing prediction lines in the background. You can continue navigating while this runs.</div>';
   const points = state.trajectory;
   if (!points) return '<div class="chart-message">Prognosis trajectory not computed yet <button data-compute-trajectory type="button">Compute</button></div>';
+  if (missingShownClass(points)) {
+    return `<div class="chart-message">These prediction lines were computed before every class was kept, so ${escapeHtml(riskLabel)} is
+      not available. Reset the statistics on the Statistics page to compute them again.</div>`;
+  }
 
   const lines = models.map((model) => {
-    const coordinates = points.filter((point) => point.risk[model.id] !== null)
-      .map((point) => `${fraction(point.offset_seconds) * 1000},${(1 - point.risk[model.id]) * 100}`);
+    const coordinates = points.filter((point) => probability(point, model.id) !== null)
+      .map((point) => `${fraction(point.offset_seconds) * 1000},${(1 - probability(point, model.id)) * 100}`);
     return coordinates.length ? `<polyline points="${coordinates.join(" ")}" style="stroke: var(--model-${model.id})"/>` : "";
   }).join("");
-  const dots = points.flatMap((point) => models.filter((model) => point.risk[model.id] !== null).map((model) => {
-    const value = point.risk[model.id];
-    const where = point.kind === "day" ? `end of ${texts.day} ${point.day}` : `${stageNoun} on ${timeLabel(point.offset_seconds)}`;
-    const top = `calc(${CHART_PADDING}px + ${(1 - value) * 100}% - ${(1 - value) * 2 * CHART_PADDING}px)`;
-    return `<i class="dot ${point.kind === "stage" ? "image-event" : ""}" style="left: ${position(point.offset_seconds)}; top: ${top}; background: var(--model-${model.id})"
-      title="${escapeHtml(`${model.name} at the ${where}: ${riskLabel} ${percent(value)}`)}"></i>`;
-  })).join("");
+  const dots = points.filter((point) => inView(point.offset_seconds)).flatMap((point) =>
+    models.filter((model) => probability(point, model.id) !== null).map((model) => {
+      const value = probability(point, model.id);
+      const where = point.kind === "day" ? `end of ${texts.day} ${point.day}` : `${stageNoun} on ${timeLabel(point.offset_seconds)}`;
+      const top = `calc(${CHART_PADDING}px + ${(1 - value) * 100}% - ${(1 - value) * 2 * CHART_PADDING}px)`;
+      return `<i class="dot ${point.kind === "stage" ? "image-event" : ""}" style="left: ${position(point.offset_seconds)}; top: ${top}; background: var(--model-${model.id})"
+        title="${escapeHtml(`${model.name} at the ${where}: ${riskLabel} ${percent(value)}`)}"></i>`;
+    })).join("");
   return `<svg viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true"><line class="threshold" x1="0" x2="1000" y1="50" y2="50"/>${lines}</svg>${dots}
     <span class="chart-axis" style="top: 0">100%</span><span class="chart-axis" style="top: calc(50% - 7px)">50%</span><span class="chart-axis" style="bottom: 0">0%</span>`;
+}
+
+/** Whether marks of one lane overlap at the current zoom. */
+function crowded() {
+  const plotWidth = Math.max(320, container.clientWidth - 124);
+  const pixelsPerSecond = plotWidth / (view().end - view().start);
+  return visibleTypes.some((type) => {
+    const offsets = state.patient.events.filter((event) => eventTypeOf(event.activity) === type && inView(event.offset_seconds))
+      .map((event) => event.offset_seconds).sort((a, b) => a - b);
+    return offsets.some((offset, index) => index > 0 && offset !== offsets[index - 1]
+      && (offset - offsets[index - 1]) * pixelsPerSecond < CROWDED_PIXELS);
+  });
+}
+
+/**
+ * Zoom buttons and the browse bar: every event of the stay as a tick, the shown window as a box
+ * that can be dragged, and the cutoff. Clicking the bar moves the window there; double-click shows all.
+ */
+function browseBar() {
+  const all = total();
+  const { start, end } = view();
+  const zoomed = Boolean(state.zoom);
+  const ticks = state.patient.events.map((event) =>
+    `<i style="left: ${(event.offset_seconds / all) * 100}%; background: var(--lane-${eventTypeOf(event.activity).key})"></i>`).join("");
+  const cutoff = state.cutoff ? `<b class="overview-cutoff" style="left: ${(state.cutoff.seconds / all) * 100}%"></b>` : "";
+  const note = !zoomed && crowded() ? '<span class="overview-note">Some events overlap: zoom in with + or Ctrl + scroll</span>' : "";
+  return `<span class="zoom-tools">
+      <button data-zoom="in" type="button" title="Zoom in (or Ctrl + scroll on the timeline)">+</button>
+      <button data-zoom="out" type="button" ${zoomed ? "" : "disabled"} title="Zoom out">-</button>
+      <button data-zoom="fit" type="button" ${zoomed ? "" : "disabled"} title="Show the whole case">All</button>
+    </span>
+    <div class="overview ${zoomed ? "zoomed" : ""}" title="${zoomed ? "Drag the box to browse the case; double-click to show all" : "The whole case; zoom in to browse it"}">
+      ${ticks}${cutoff}<div class="overview-window" style="left: ${(start / all) * 100}%; width: ${((end - start) / all) * 100}%"></div>${note}
+    </div>`;
+}
+
+/** Show the window [start, end] (null: the whole stay), kept inside the stay and at least MIN_SPAN long. */
+function setZoom(window) {
+  const all = total();
+  if (!window || window.end - window.start >= all) {
+    state.zoom = null;
+  } else {
+    const span = Math.max(Math.min(MIN_SPAN, all), window.end - window.start);
+    const start = Math.min(Math.max(0, window.start), all - span);
+    state.zoom = { start, end: start + span };
+  }
+  closeBrush();
+  render();
+}
+
+/** Zoom by a factor around a time (default: the middle of the window). */
+function zoomBy(factor, around) {
+  const { start, end } = view();
+  const centre = around ?? (start + end) / 2;
+  const share = (centre - start) / (end - start);
+  const span = (end - start) / factor;
+  setZoom({ start: centre - share * span, end: centre - share * span + span });
+}
+
+/** Move the window so that a time is in view (e.g. after Jump to end). */
+export function reveal(seconds) {
+  if (!state.zoom || inView(seconds)) return;
+  const span = state.zoom.end - state.zoom.start;
+  setZoom({ start: seconds - span * 0.8, end: seconds + span * 0.2 });
+}
+
+function onWheel(event) {
+  if (!state.patient || !event.target.closest(".lane, .chart, .axis, .overview")) return;
+  if (event.ctrlKey || event.metaKey) {
+    event.preventDefault();
+    const { seconds } = secondsAt(event.clientX);
+    zoomBy(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP, seconds);
+  } else if (state.zoom && (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY))) {
+    event.preventDefault();
+    const { start, end } = view();
+    const delta = ((event.shiftKey ? event.deltaY : event.deltaX) / Math.max(1, plot().getBoundingClientRect().width)) * (end - start);
+    setZoom({ start: start + delta, end: end + delta });
+  }
 }
 
 export function describeEvent(eventId) {
@@ -157,7 +288,14 @@ export function describeEvent(eventId) {
 function secondsAt(clientX) {
   const rect = plot().getBoundingClientRect();
   const share = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-  return { seconds: share * state.stayDays * DAY, pixelsPerSecond: rect.width / (state.stayDays * DAY) };
+  const { start, end } = view();
+  return { seconds: start + share * (end - start), pixelsPerSecond: rect.width / (end - start) };
+}
+
+/** A time from a position on the browse bar, which always spans the whole stay. */
+function overviewSeconds(clientX) {
+  const rect = container.querySelector(".overview").getBoundingClientRect();
+  return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)) * total();
 }
 
 /** Snap to a nearby image event, then to a nearby end of day, else keep the time. */
@@ -175,6 +313,19 @@ function snappedCutoff(clientX) {
 
 function onPointerDown(event) {
   if (!state.patient || event.button !== 0) return;
+  const overview = event.target.closest(".overview");
+  if (overview) {
+    // Browse: drag the window box, or move it to where the bar is pressed and drag from there
+    if (!state.zoom) return;
+    event.preventDefault();
+    const { start, end } = view();
+    const at = overviewSeconds(event.clientX);
+    const grab = at >= start && at <= end ? at - start : (end - start) / 2;
+    if (!(at >= start && at <= end)) setZoom({ start: at - grab, end: at - grab + (end - start) });
+    drag = { pointerId: event.pointerId, mode: "browse", grab };
+    container.setPointerCapture(event.pointerId);
+    return;
+  }
   const onLine = event.target.closest(".cutoff-line");
   if (!onLine && (event.target.closest("button, .chart-message, .brush-menu") || !event.target.closest(".lane, .chart"))) return;
   event.preventDefault();
@@ -186,6 +337,12 @@ function onPointerDown(event) {
 
 function onPointerMove(event) {
   if (!drag || drag.pointerId !== event.pointerId) return;
+  if (drag.mode === "browse") {
+    const { start, end } = view();
+    const from = overviewSeconds(event.clientX) - drag.grab;
+    setZoom({ start: from, end: from + (end - start) });
+    return;
+  }
   if (drag.mode === "pending" && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > DRAG_THRESHOLD) drag.mode = "brush";
   if (drag.mode === "cutoff") {
     drag.cutoff = snappedCutoff(event.clientX);
@@ -201,6 +358,7 @@ function onPointerUp(event) {
   drag = null;
   container.releasePointerCapture(event.pointerId);
   container.classList.remove("dragging");
+  if (finished.mode === "browse") return;
   if (event.type === "pointercancel") {
     closeBrush();
     render();
@@ -216,6 +374,7 @@ function onPointerUp(event) {
 
 function previewCutoff(cutoff) {
   const line = container.querySelector(".cutoff-line");
+  if (!line) return;
   line.style.left = position(cutoff.seconds);
   line.classList.toggle("near-end", nearEnd(cutoff));
   container.querySelector(".future").style.left = position(cutoff.seconds);
@@ -233,7 +392,8 @@ function onKeyDown(event) {
     : offsets.reverse().find((value) => value < current);
   if (next === undefined) return;
   setCutoff({ kind: "free", seconds: next });
-  container.querySelector(".cutoff-line").focus();
+  reveal(next);
+  container.querySelector(".cutoff-line")?.focus();
 }
 
 /** A lane is off when it has known events and none of them is given to the models. */
@@ -244,7 +404,20 @@ function laneIsOff(typeKey) {
 
 function onClick(event) {
   if (event.target.closest("[data-compute-trajectory]")) return loadTrajectory(true);
-  if (event.target.closest("[data-jump-end]")) return setCutoff(endCutoff());
+  if (event.target.closest("[data-jump-end]")) {
+    const end = endCutoff();
+    setCutoff(end);
+    return reveal(end.seconds);
+  }
+  const zoom = event.target.closest("[data-zoom]");
+  if (zoom) {
+    const action = zoom.dataset.zoom;
+    // Zooming in centres on the cutoff when it is in view, so the line stays on screen
+    const around = state.cutoff && inView(state.cutoff.seconds) ? state.cutoff.seconds : undefined;
+    if (action === "in") return zoomBy(ZOOM_STEP, around);
+    if (action === "out") return zoomBy(1 / ZOOM_STEP, around);
+    return setZoom(null);
+  }
   const lane = event.target.closest("[data-lane]");
   if (lane) return setEventType(lane.dataset.lane, laneIsOff(lane.dataset.lane));
   const day = event.target.closest("[data-day]");
@@ -280,14 +453,14 @@ function drawBrush(x1, y1, x2, y2) {
 /** Events inside the box: its time range, on the lanes it covers (all lanes if none). */
 function eventsInBox(box) {
   const area = plot().getBoundingClientRect();
-  const total = state.stayDays * DAY;
-  const from = ((box.left - area.left) / area.width) * total;
-  const to = ((box.right - area.left) / area.width) * total;
+  const { start, end } = view();
+  const from = start + ((box.left - area.left) / area.width) * (end - start);
+  const to = start + ((box.right - area.left) / area.width) * (end - start);
   // Only lanes scrolled into view can be covered by the box.
-  const view = container.querySelector(".lane-scroll").getBoundingClientRect();
+  const lanes = container.querySelector(".lane-scroll").getBoundingClientRect();
   const covered = [...container.querySelectorAll(".lane")]
     .map((lane, index) => ({ rect: lane.getBoundingClientRect(), type: visibleTypes[index] }))
-    .filter(({ rect }) => rect.bottom > Math.max(box.top, view.top) && rect.top < Math.min(box.bottom, view.bottom))
+    .filter(({ rect }) => rect.bottom > Math.max(box.top, lanes.top) && rect.top < Math.min(box.bottom, lanes.bottom))
     .map(({ type }) => type);
   const types = covered.length ? covered : visibleTypes;
   const selected = state.patient.events.filter((event) =>

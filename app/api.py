@@ -20,7 +20,7 @@ class SelectionBody(BaseModel):
     cutoff_seconds: int | None = None
 
     def selection(self) -> Selection:
-        return Selection(**self.model_dump(exclude={"model", "scope"}))
+        return Selection(**self.model_dump(exclude={"model", "scope", "outcome"}))
 
 
 class PredictionBody(SelectionBody):
@@ -30,6 +30,7 @@ class PredictionBody(SelectionBody):
 class ExplanationBody(SelectionBody):
     scope: str = "context"
     model: str | None = None  # the model to explain; default: the main explanation
+    outcome: str | None = None  # the class the scores point to; default: the risk class
 
 
 class SetupPathsBody(BaseModel):
@@ -115,7 +116,7 @@ def predict(body: PredictionBody, service: DemoService = Depends(get_service)):
 
 @api.post("/explain")
 def explain(body: ExplanationBody, service: DemoService = Depends(get_service)):
-    return service.explain(body.selection(), body.scope, body.model)
+    return service.explain(body.selection(), body.scope, body.model, body.outcome)
 
 
 @api.get("/statistics")

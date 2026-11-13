@@ -3,7 +3,8 @@ import { api } from "../api.js";
 import { config, imageNoun, models, riskLabel, stageNoun, texts, fill } from "../config.js";
 import { selectPatient } from "../controller.js";
 import { escapeHtml, percent, plural, timeLabel } from "../format.js";
-import { accuracy, agreement, atDay, atSharedImages, auc, brier, flips, isCorrect, macroF1, pairs, predictedClass, series, settlesFrom } from "../metrics.js";
+import { accuracy, agreement, atDay, atSharedImages, auc, brier, flips, importanceDelta, isCorrect, macroF1, missingShownClass, pairs, predictedClass,
+  probability, series, settlesFrom } from "../metrics.js";
 import { state } from "../state.js";
 import { showToast } from "./toast.js";
 
@@ -36,6 +37,11 @@ export function init() {
     showAllTypes = true;
     render(lastPatients);
   });
+}
+
+/** Draw the page again with the cases already loaded (another class shown). */
+export function rerender() {
+  if (lastPatients.length) render(lastPatients);
 }
 
 /** Fill the Statistics page (the controller shows it). */
@@ -119,7 +125,7 @@ const pointLabel = (point) => (point.kind === "day" ? `end of ${texts.day} ${poi
 
 function render(rawPatients) {
   lastPatients = rawPatients;
-  const patients = rawPatients.map((patient) => ({ ...patient, isRisk: patient.ground_truth.code === config.riskClass }));
+  const patients = rawPatients;
   const computed = patients.filter((patient) => patient.points);
   const minimumChartPatients = Math.max(2, Math.ceil(computed.length * MIN_CHART_PATIENT_SHARE));
   const chartDays = spacedDays(supportedHorizon(computed, minimumChartPatients));
@@ -128,7 +134,9 @@ function render(rawPatients) {
   // until a reset: say so, or results present on the first visit look unexplained.
   els.computed.textContent = `${computed.length} of ${plural(patients.length, "case")} computed. `
     + "Opening a case in the Case view computes its prediction lines, so the cases you opened are already included; "
-    + "results are kept until you reset them.";
+    + "results are kept until you reset them."
+    + (computed.some((patient) => missingShownClass(patient.points))
+      ? ` Some cases were computed before every class was kept: reset the statistics to see ${riskLabel} for them.` : "");
   els.caveat.textContent = fill("statistics_caveat", {
     count: patients.length, last_day: `${texts.day} ${chartDays.at(-1)}`, minimum: minimumChartPatients, table_day: `${texts.day} ${shownDays.at(-1)}`,
   });
@@ -218,7 +226,9 @@ function importance(patients) {
   for (const profile of profiles) {
     for (const row of profile.rows) {
       const entry = totals.get(row.key) || { label: row.label, models: {} };
-      for (const [model, delta] of Object.entries(row.delta)) {
+      for (const model of Object.keys(row.delta)) {
+        const delta = importanceDelta(row, model);
+        if (delta === undefined) continue;
         const stats = entry.models[model] || (entry.models[model] = { absolute: 0, signed: 0, count: 0 });
         stats.absolute += Math.abs(delta);
         stats.signed += delta;
@@ -249,11 +259,11 @@ function importance(patients) {
 
 /** One day of the per-case table: the risk probability, coloured by the predicted class. */
 function cell(point, model, truth) {
-  const value = point?.risk[model];
+  const value = point ? probability(point, model) : null;
   if (value === null || value === undefined) return '<td><span class="cell empty">-</span></td>';
   const predicted = predictedClass(point, model);
   const strength = 0.12 + Math.abs(value - 0.5) * 1.1;
-  const tone = predicted === config.riskClass ? "var(--risk)" : `var(--outcome-${predicted})`;
+  const tone = `var(--outcome-${predicted})`;
   const miss = predicted !== truth;
   const label = config.outcomes.find((outcome) => outcome.code === predicted)?.label || predicted;
   return `<td><span class="cell ${miss ? "miss" : ""} ${strength > 0.45 ? "strong" : ""}" style="--tone: ${tone}; --strength: ${strength}"

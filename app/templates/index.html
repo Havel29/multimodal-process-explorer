@@ -38,6 +38,8 @@
       <button id="nextPatient" type="button" aria-label="Next case" title="Next case">&#8250;</button>
     </nav>
     <div class="runtime-controls">
+      <label id="classControl" title="The class whose probability the prediction lines, statistics and explanations show (by default the risk class of the configuration, the rarest unless set)">Class shown
+        <select id="classSelect" aria-label="Class shown"></select></label>
       <label>Inference <select id="deviceSelect" aria-label="Inference device">
         <option value="auto">Auto</option>
         <option value="cpu">CPU</option>
@@ -121,6 +123,7 @@
         <div class="knowledge-actions">
           <button id="enableAll" type="button">Select all</button>
           <button id="disableAll" type="button">Clear</button>
+          <input id="knowledgeSearch" type="search" placeholder="Search events" aria-label="Search the events" autocomplete="off">
         </div>
         <div id="knowledgeList" class="knowledge-list"></div>
       </div>

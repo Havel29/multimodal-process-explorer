@@ -240,6 +240,24 @@ def test_a_setup_can_use_a_single_model_and_is_restored_with_it(config, tmp_path
     assert [spec.kind for spec in restored.config.models] == ["text"]
 
 
+def test_an_edited_configuration_for_the_same_data_replaces_the_saved_one(config, tmp_path, monkeypatch):
+    import dataclasses
+
+    xes, images, models = make_inputs(tmp_path)
+    monkeypatch.setattr("app.setup.read_xes", lambda _: frame())
+    manager = SetupManager(config, runtime_dir=tmp_path / "runtime")
+    inspected = manager.inspect(str(xes), str(images), str(models))
+    manager.apply(inspected["token"], selections(), {"text": "text.pth", "image": None, "flava": None})
+
+    # A copy of the configuration with another risk class (same classes, same event types) is used
+    edited = dataclasses.replace(config, risk_class="home")
+    assert SetupManager(edited, runtime_dir=tmp_path / "runtime").restore().config.risk_class == "home"
+    # A configuration for other data (other classes) is not: the saved one stays
+    other = dataclasses.replace(config, outcome_classes=config.outcome_classes[:1], risk_class=config.outcome_classes[0].code)
+    restored = SetupManager(other, runtime_dir=tmp_path / "runtime").restore()
+    assert [item.code for item in restored.config.outcome_classes] == [item.code for item in config.outcome_classes]
+
+
 def test_a_setup_needs_at_least_one_model(config, tmp_path, monkeypatch):
     xes, images, models = make_inputs(tmp_path)
     monkeypatch.setattr("app.setup.read_xes", lambda _: frame())

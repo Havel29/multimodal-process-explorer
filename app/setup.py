@@ -85,9 +85,12 @@ class SetupManager:
             }
             if not checkpoints or not all(path.is_file() for path in checkpoints.values()):
                 return None
-            # The configuration completed from the log at setup, if there is one
+            # The configuration completed from the log at setup, if there is one; a complete
+            # configuration named by EXPLORER_CONFIG for the same data replaces it (an edited copy)
             saved = self.runtime_dir / state["config"] if state.get("config") else None
             base = load_config(saved) if saved and saved.is_file() else self.base_config
+            if base is not self.base_config and self._fits(base):
+                base = self.base_config
             # The models of that setup: one to three, each with its checkpoint
             models = tuple(
                 dataclasses.replace(spec, checkpoint=checkpoints[spec.kind])
@@ -109,6 +112,12 @@ class SetupManager:
             return None
         self.configured = True
         return service
+
+    def _fits(self, saved: DemoConfig) -> bool:
+        """Whether the configuration loaded at start-up can replace the one saved by the setup:
+        it has its own event types and the same outcome classes, so it describes the same data."""
+        codes = lambda config: [outcome.code for outcome in config.outcome_classes]
+        return bool(self.base_config.event_types) and bool(codes(saved)) and codes(self.base_config) == codes(saved)
 
     def _legacy_state(self) -> dict | None:
         """Recover the newest complete upload made before setup persistence existed."""
