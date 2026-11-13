@@ -1,9 +1,9 @@
 // Timeline: lanes, cutoff line, prediction chart, zoom with the browse bar, and mouse gestures.
 import { DAY, config, displayName, eventTypeOf, models, riskLabel, shortName, stageNoun, texts } from "../config.js";
-import { focusEvent, loadTrajectory, setCutoff, setEventType, setKnowledge } from "../controller.js";
+import { focusEvent, loadTrajectory, selectNoEvent, setCutoff, setEventType, setKnowledge } from "../controller.js";
 import { escapeHtml, percent, plural, timeLabel } from "../format.js";
 import { missingShownClass, probability } from "../metrics.js";
-import { atEnd, availableEvents, cutoffLabel, dayCutoff, endCutoff, eventById, stageCutoff, state } from "../state.js";
+import { atEnd, availableEvents, noneAtEnd, cutoffLabel, dayCutoff, endCutoff, eventById, stageCutoff, state } from "../state.js";
 
 const SNAP_PIXELS = 9;
 const DRAG_THRESHOLD = 5;
@@ -14,6 +14,8 @@ const MAX_VISIBLE_LANES = 10;
 const MAX_NAMED_LANES = 3;
 // Enough horizontal room for a complete "Day 00" tick without overlap.
 const MIN_DAY_TICK_WIDTH = 56;
+// Half the width of a day label ("Day 71"): labels keep this far from the ends of the axis
+const DAY_LABEL_HALF = 31;
 // Zoom: each step halves or doubles the time shown, down to two hours.
 const ZOOM_STEP = 2;
 const MIN_SPAN = 2 * 3600;
@@ -111,8 +113,11 @@ export function render() {
   container.innerHTML = `<div class="plot-under">${dayBands()}</div>
     <div class="lane-scroll ${scrolling ? "scrolling" : ""}" style="--visible-lanes: ${MAX_VISIBLE_LANES}">${rows}</div>
     ${hint}${chartLabel}<div class="chart">${chart()}</div>
-    <span class="axis-side"><button class="jump-end" data-jump-end type="button" ${atEnd() ? "disabled" : ""}
-      title="Move the cutoff to the last event and give the models every event of the case">Jump to end</button></span>
+    <span class="axis-side">
+      <button class="all-events" data-all-events="on" type="button" ${atEnd() ? "disabled" : ""}
+        title="Move the cutoff to the last event and give the models every event of the case">Select all</button>
+      <button class="all-events" data-all-events="off" type="button" ${noneAtEnd() ? "disabled" : ""}
+        title="Move the cutoff to the last event and give the models no event: pick events back from the timeline or the list">Deselect all</button></span>
     <div class="axis">${axis()}</div>
     ${browseBar()}
     <div class="plot-over">${cutoffLine()}</div>`;
@@ -127,7 +132,7 @@ function dayBands() {
 
 function axis() {
   const { start, end } = view();
-  const plotWidth = Math.max(320, container.clientWidth - 124);
+  const plotWidth = Math.max(320, container.clientWidth - 148);
   const shownDays = (end - start) / DAY;
   const step = Math.max(1, Math.ceil((shownDays * MIN_DAY_TICK_WIDTH) / plotWidth));
   const activeDay = state.cutoff?.kind === "day" ? state.cutoff.day : null;
@@ -139,9 +144,17 @@ function axis() {
   for (let day = firstDay; day <= lastDay; day += step) {
     if (!anchors.some((anchor) => anchor !== day && Math.abs(anchor - day) < step)) shown.add(day);
   }
-  const days = [...shown].filter(visibleDay).sort((a, b) => a - b).map((day) => {
+  // A label near an edge is moved inside the axis (CSS clamp); one that would then cover its neighbour is dropped
+  const centre = (day) => Math.min(plotWidth - DAY_LABEL_HALF, Math.max(DAY_LABEL_HALF, fraction((day - 0.5) * DAY) * plotWidth));
+  const kept = [];
+  for (const day of [...shown].filter(visibleDay).sort((a, b) => a - b)) {
+    const previous = kept[kept.length - 1];
+    if (previous === undefined || centre(day) - centre(previous) >= 2 * DAY_LABEL_HALF - 2) kept.push(day);
+    else if (day === activeDay || (day === lastDay && previous !== activeDay)) kept[kept.length - 1] = day;
+  }
+  const days = kept.map((day) => {
     const active = state.cutoff?.kind === "day" && state.cutoff.day === day;
-    return `<button class="day-button ${active ? "active" : ""}" style="left: ${position((day - 0.5) * DAY)}" data-day="${day}" type="button"
+    return `<button class="day-button ${active ? "active" : ""}" style="left: clamp(${DAY_LABEL_HALF}px, ${position((day - 0.5) * DAY)}, calc(100% - ${DAY_LABEL_HALF}px))" data-day="${day}" type="button"
       aria-pressed="${active}" title="Predict with everything known by the end of ${texts.day} ${day}">${texts.day} ${day}</button>`;
   }).join("");
   return days + hourTicks(shownDays, plotWidth);
@@ -203,7 +216,7 @@ function chart() {
 
 /** Whether marks of one lane overlap at the current zoom. */
 function crowded() {
-  const plotWidth = Math.max(320, container.clientWidth - 124);
+  const plotWidth = Math.max(320, container.clientWidth - 148);
   const pixelsPerSecond = plotWidth / (view().end - view().start);
   return visibleTypes.some((type) => {
     const offsets = state.patient.events.filter((event) => eventTypeOf(event.activity) === type && inView(event.offset_seconds))
@@ -258,7 +271,7 @@ function zoomBy(factor, around) {
   setZoom({ start: centre - share * span, end: centre - share * span + span });
 }
 
-/** Move the window so that a time is in view (e.g. after Jump to end). */
+/** Move the window so that a time is in view (e.g. after Select all). */
 export function reveal(seconds) {
   if (!state.zoom || inView(seconds)) return;
   const span = state.zoom.end - state.zoom.start;
@@ -404,9 +417,11 @@ function laneIsOff(typeKey) {
 
 function onClick(event) {
   if (event.target.closest("[data-compute-trajectory]")) return loadTrajectory(true);
-  if (event.target.closest("[data-jump-end]")) {
+  const all = event.target.closest("[data-all-events]");
+  if (all) {
     const end = endCutoff();
-    setCutoff(end);
+    if (all.dataset.allEvents === "on") setCutoff(end);
+    else selectNoEvent();
     return reveal(end.seconds);
   }
   const zoom = event.target.closest("[data-zoom]");

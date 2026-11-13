@@ -84,7 +84,8 @@ h1, h2, p { margin: 0; }
 .toast.success { background: #2e7d4f; }
 
 /* Patient view: header */
-.workspace { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; }
+/* On a short window the panels keep a usable height and the case view scrolls instead */
+.workspace { --min-panels: 260px; display: grid; grid-template-rows: auto auto minmax(var(--min-panels), 1fr); min-height: 0; overflow-y: auto; }
 .pathway { padding: 16px 24px 12px; background: var(--surface); }
 .pathway.clipped { overflow-y: auto; }
 /* The bar between the timeline and the panels: drag it up or down */
@@ -105,7 +106,7 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 
 /* Patient view: timeline */
 /* Lanes, chart and axis share two columns; the layers below and above span the plot column. */
-.swimlanes { --label-width: 124px; position: relative; display: grid; grid-template-columns: var(--label-width) minmax(0, 1fr); color: var(--muted); font-size: 12px; font-weight: 600; }
+.swimlanes { --label-width: 148px; position: relative; display: grid; grid-template-columns: var(--label-width) minmax(0, 1fr); color: var(--muted); font-size: 12px; font-weight: 600; }
 .swimlanes.dragging, .swimlanes.dragging * { cursor: ew-resize !important; }
 .lane-scroll { grid-column: 1 / -1; position: relative; z-index: 1; display: grid; grid-template-columns: var(--label-width) minmax(0, 1fr); border-top: 1px solid var(--hairline); scrollbar-width: none; }
 .lane-scroll::-webkit-scrollbar { display: none; }
@@ -117,7 +118,8 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .lane-toggle.off { color: var(--faint); text-decoration: line-through; }
 .lane-toggle.off i { opacity: .35; }
 .lane-toggle i { flex-shrink: 0; width: 9px; height: 9px; border-radius: 2px; }
-.chart-label { display: block; height: var(--chart-height); padding-top: 4px; line-height: 1.25; }
+/* The chart row is never shorter than its legend (score name plus one line per model) */
+.chart-label { display: block; min-height: var(--chart-height); padding-top: 4px; line-height: 1.25; }
 .chart-label small { display: block; color: var(--faint); font-size: 11px; font-weight: 500; }
 .lane { position: relative; height: var(--lane-height); border-bottom: 1px solid var(--hairline); cursor: crosshair; }
 .plot-under, .plot-over { position: absolute; top: 0; bottom: calc(var(--axis-height) + var(--overview-height)); left: var(--label-width); right: 0; pointer-events: none; }
@@ -156,18 +158,20 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .swimlanes.dragging .overview, .overview.zoomed:active { cursor: grabbing; }
 .overview-note { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink); background: rgba(255, 248, 230, .85); font-size: 11px; font-weight: 600; pointer-events: none; }
 .axis-side { display: flex; align-items: flex-start; padding-top: 6px; }
-.jump-end { padding: 4px 8px; color: var(--navy); background: #fff; border: 1px solid var(--navy); border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.jump-end:hover:not(:disabled) { color: #fff; background: var(--navy); }
-.jump-end:disabled { color: var(--faint); border-color: var(--line); cursor: default; }
+.axis-side { gap: 4px; }
+.all-events { padding: 4px 6px; color: var(--navy); background: #fff; border: 1px solid var(--navy); border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.all-events:hover:not(:disabled) { color: #fff; background: var(--navy); }
+.all-events:disabled { color: var(--faint); border-color: var(--line); cursor: default; }
 .day-button { position: absolute; top: 6px; transform: translateX(-50%); padding: 4px 8px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .day-button:hover { color: var(--ink); border-color: var(--accent); }
 .day-button.active { color: #fff; background: var(--navy); border-color: var(--navy); }
 .day-label { position: absolute; top: 10px; transform: translateX(-50%); color: var(--faint); font-size: 11px; font-weight: 500; white-space: nowrap; }
-.event-detail { min-height: 40px; margin-top: 6px; padding: 9px 12px; color: var(--muted); background: var(--canvas); border-radius: 6px; font-size: 13px; }
+/* At most three lines: a long event (a lab panel can be a page of text) scrolls here instead of pushing the panels off the screen */
+.event-detail { min-height: 40px; max-height: calc(3 * 1.45em + 18px); overflow-y: auto; overscroll-behavior: contain; margin-top: 6px; padding: 9px 12px; color: var(--muted); background: var(--canvas); border-radius: 6px; font-size: 13px; }
 .event-detail strong { color: var(--ink); }
 
 /* Trajectory chart inside the timeline */
-.chart { position: relative; z-index: 1; height: var(--chart-height); border-bottom: 1px solid var(--line); cursor: crosshair; }
+.chart { position: relative; z-index: 1; min-height: var(--chart-height); border-bottom: 1px solid var(--line); cursor: crosshair; }
 .chart svg { position: absolute; inset: 6px 0; width: 100%; height: calc(100% - 12px); overflow: visible; }
 .chart .threshold { stroke: #c4cdd5; stroke-dasharray: 3 3; }
 .chart polyline { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
@@ -204,6 +208,10 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 .knowledge-item strong i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: var(--c); border-radius: 2px; }
 .knowledge-item small { display: -webkit-box; overflow: hidden; color: var(--muted); font-size: 12px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .knowledge-item.off strong, .knowledge-item.off small { color: var(--faint); text-decoration: line-through; }
+/* After the cutoff: listed but greyed out, as the models cannot know it yet */
+.knowledge-item.later { cursor: default; }
+.knowledge-item.later strong, .knowledge-item.later small, .knowledge-item.later time { color: var(--faint); }
+.knowledge-item.later strong i { opacity: .4; }
 .knowledge-item .attr { display: block; margin-top: 4px; }
 .out-of-context { margin-left: 6px; padding: 1px 5px; color: var(--muted); background: var(--canvas); border-radius: 3px; font-size: 11px; font-style: normal; font-weight: 600; white-space: nowrap; }
 .analysis-actions select { padding: 4px 6px; background: #fff; border: 1px solid var(--line); border-radius: 5px; font: inherit; font-size: 12px; }

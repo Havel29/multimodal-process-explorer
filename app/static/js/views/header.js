@@ -63,7 +63,7 @@ export function initSetupPage(configured, openExplorer) {
   els.inputsTab.classList.add("active");
   els.inputsTab.setAttribute("aria-current", "page");
   fillClasses();
-  for (const control of [els.exportCsv, els.device, els.help, els.classSelect]) {
+  for (const control of [els.exportCsv, els.device, els.classSelect]) {
     control.disabled = true;
     control.title = "Available once the explorer is open";
   }

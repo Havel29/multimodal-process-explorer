@@ -142,7 +142,7 @@ and the Statistics page are hidden.
 ## Using the explorer
 
 The tabs at the top open the **Inputs** (the setup), the **Case view** and the
-**Statistics** page. **Help** starts a short guided tour of the Case view.
+**Statistics** page. **Help** starts a short guided tour of the page that is open.
 
 - **Case:** choose one at the top of the Case view. It opens with the cutoff at
   its last event and every event given to the models, so the predictions and
@@ -158,13 +158,15 @@ The tabs at the top open the **Inputs** (the setup), the **Case view** and the
   or scroll sideways (Shift + scroll).
 - **What the models know:**
   - drag the black line, click the timeline or pick a day to set the cutoff;
-    **Jump to end** puts it back at the last event, with every event;
+    **Select all** puts it back at the last event, with every event, and
+    **Deselect all** at the last event with none, to add back only some;
   - click an image marker to predict right after that image;
   - click a lane name to remove its events, and click it again to add them back;
   - drag a box over events to use only those, or to exclude them;
-  - tick or untick single events in **Events given to the models**; its search
-    box filters the list, and **Select all** and **Clear** then act on the
-    matching events only.
+  - tick or untick single events in **Events given to the models**, which lists
+    every event of the case (those after the cutoff greyed out, without a
+    checkbox); its search box filters the list, and **Select all** and
+    **Clear** then act on the matching events only.
 - **Predictions:** each model's predicted outcome and probability, whether it
   matches the observed outcome, and the inference time.
 - **Why?:** one **Explain** button per explained model (by default the

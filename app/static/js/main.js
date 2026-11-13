@@ -32,6 +32,7 @@ try {
     if (page === setup.STATISTICS_HASH && !document.getElementById("statisticsTab").classList.contains("hidden")) await showStatistics();
   } else {
     header.initSetupPage(status.configured, setup.enterExplorer);
+    tour.init();
   }
 } catch (error) {
   document.getElementById("patientTitle").textContent = "Input data is not prepared yet";

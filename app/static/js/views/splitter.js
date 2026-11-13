@@ -5,7 +5,7 @@ const STORAGE_KEY = "explorer.split";
 const DEFAULT_CHART = 84;
 const MIN_CHART = 48;
 const MIN_PATHWAY = 140;
-const MIN_PANELS = 200;
+const MIN_PANELS = 260;  // as --min-panels in style.css
 const KEY_STEP = 24;
 
 const bar = document.getElementById("splitter");
@@ -41,7 +41,8 @@ function restore() {
 /** The timeline height wanted, turned into a chart height or a clipped timeline area. */
 function resizeTo(start, wanted) {
   const room = workspace.getBoundingClientRect().height - bar.getBoundingClientRect().height - MIN_PANELS;
-  const height = Math.min(Math.max(wanted, MIN_PATHWAY), Math.max(MIN_PATHWAY, room));
+  // The case view scrolls when the window is short, so growing never clips the timeline below its natural height
+  const height = Math.min(Math.max(wanted, MIN_PATHWAY), Math.max(MIN_PATHWAY, room, start.naturalAtMinimum));
   if (height >= start.naturalAtMinimum) size = { chart: MIN_CHART + (height - start.naturalAtMinimum), clip: null };
   else size = { chart: MIN_CHART, clip: height };
   apply();

@@ -131,6 +131,15 @@ export function setKnowledge(cutoff, enabledIds) {
   knowledgeChanged(true);
 }
 
+/** Cutoff at the last event with no event selected; the predictions wait for "Run with selected events". */
+export function selectNoEvent() {
+  state.cutoff = endCutoff();
+  state.enabled = new Set();
+  state.stale = true;
+  analysis.clear();
+  renderAll();
+}
+
 /** Tick or untick events; the predictions wait for "Run with selected events". */
 export function toggleEvents(eventIds, enabled) {
   if (!state.cutoff) return;

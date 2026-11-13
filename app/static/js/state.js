@@ -65,6 +65,12 @@ export function endCutoff() {
   return { kind: "free", seconds: events[events.length - 1].offset_seconds };
 }
 
+/** True when the cutoff is at the last event and no event is selected. */
+export function noneAtEnd() {
+  if (!state.cutoff || !state.patient) return false;
+  return state.cutoff.seconds >= endCutoff().seconds && state.enabled.size === 0;
+}
+
 /** True when the cutoff is at the last event and every event is selected. */
 export function atEnd() {
   if (!state.cutoff || !state.patient) return false;

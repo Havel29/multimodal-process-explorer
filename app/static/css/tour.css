@@ -5,10 +5,12 @@
 .tour-spot { position: fixed; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(15, 26, 38, .58); outline: 2px solid var(--highlight); outline-offset: 0; pointer-events: none;
   transition: left .45s ease, top .45s ease, width .45s ease, height .45s ease !important; }
 .tour-spot:after { content: ""; position: absolute; inset: -2px; border: 2px solid var(--highlight); border-radius: 8px; animation: tour-pulse 1.6s ease-out infinite !important; }
-/* Two small demonstrations: the cutoff sways left and right, the resize bar moves up and down */
+/* Small demonstrations: the cutoff sways left and right, the resize bar moves up and down, a box is dragged over the lanes */
 .tour-spot[data-demo="cutoff"]:before, .tour-spot[data-demo="splitter"]:before { content: ""; position: absolute; background: var(--highlight); border-radius: 2px; }
 .tour-spot[data-demo="cutoff"]:before { top: 8px; bottom: 8px; left: 50%; width: 3px; animation: tour-sway 2.2s ease-in-out infinite !important; }
 .tour-spot[data-demo="splitter"]:before { left: 50%; top: 50%; width: 44px; height: 3px; margin-left: -22px; animation: tour-lift 2.2s ease-in-out infinite !important; }
+.tour-spot[data-demo="box"]:before { content: ""; position: absolute; top: 18%; left: 30%; height: 0; width: 0; background: rgba(255, 255, 255, .12); border: 2px dashed var(--highlight); border-radius: 3px;
+  animation: tour-box 2.6s ease-in-out infinite !important; }
 .tour-card { position: fixed; width: min(340px, calc(100vw - 24px)); padding: 16px 18px 14px; color: var(--ink); background: #fff; border-radius: 8px; box-shadow: 0 18px 44px rgba(10, 20, 32, .35);
   transition: left .45s ease, top .45s ease !important; }
 .tour-card.enter { animation: tour-enter .35s ease-out !important; }
@@ -22,6 +24,7 @@
 @keyframes tour-pulse { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.06); } }
 @keyframes tour-sway { 0%, 100% { transform: translateX(-60px); } 50% { transform: translateX(60px); } }
 @keyframes tour-lift { 0%, 100% { transform: translateY(-14px); } 50% { transform: translateY(14px); } }
+@keyframes tour-box { 0% { width: 0; height: 0; opacity: 1; } 55%, 80% { width: 26%; height: 56%; opacity: 1; } 100% { width: 26%; height: 56%; opacity: 0; } }
 @keyframes tour-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .tour-spot, .tour-card { transition: none !important; }
