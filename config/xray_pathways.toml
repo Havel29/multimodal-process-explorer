@@ -10,7 +10,6 @@ case_noun = "patient"
 pathway_noun = "pathway"
 image_noun = "radiograph"
 stage_noun = "X-ray"
-disclaimer = "Synthetic pathways with chest X-rays from Kermany et al. (CC BY 4.0); not for clinical use."
 
 [data]
 grayscale_images = true

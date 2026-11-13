@@ -141,8 +141,8 @@ and the Statistics page are hidden.
 
 ## Using the explorer
 
-The tabs at the top open the **Case view**, the **Statistics** page and the
-**Inputs** (the setup). **Help** starts a short guided tour of the Case view.
+The tabs at the top open the **Inputs** (the setup), the **Case view** and the
+**Statistics** page. **Help** starts a short guided tour of the Case view.
 
 - **Case:** choose one at the top of the Case view. It opens with the cutoff at
   its last event and every event given to the models, so the predictions and

@@ -12,7 +12,6 @@ pathway_noun = "pathway"
 image_noun = "radiograph"
 stage_noun = "X-ray"
 day_noun = "day"
-disclaimer = "Not for diagnosis, prognosis, or clinical decision-making. Data subject to the CDSL agreement; aliases replace source identifiers."
 
 [data]
 bundle = "data/curated/demo.json"

@@ -20,7 +20,7 @@
 /* Base */
 * { box-sizing: border-box; animation: none !important; transition: none !important; }
 html, body { height: 100%; }
-body { margin: 0; display: grid; grid-template-rows: 56px 1fr 30px; color: var(--ink); background: var(--canvas); font: 14px/1.45 Inter, system-ui, sans-serif; overflow: hidden; }
+body { margin: 0; display: grid; grid-template-rows: 56px 1fr; color: var(--ink); background: var(--canvas); font: 14px/1.45 Inter, system-ui, sans-serif; overflow: hidden; }
 button { font: inherit; color: inherit; }
 h1, h2, p { margin: 0; }
 .hidden { display: none !important; }
@@ -80,7 +80,6 @@ h1, h2, p { margin: 0; }
 .patient-picker button:hover:not(:disabled) { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.5); }
 .patient-picker button:disabled { opacity: .35; cursor: default; }
 .institution { font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
-footer { display: flex; align-items: center; padding: 0 24px; color: var(--muted); background: #e9edf0; border-top: 1px solid var(--line); font-size: 12px; }
 .toast { position: fixed; right: 24px; bottom: 44px; max-width: 420px; padding: 12px 15px; color: #fff; background: #9f3d3d; border-radius: 6px; font-size: 13px; z-index: 10; }
 .toast.success { background: #2e7d4f; }
 
@@ -315,7 +314,7 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 
 /* Below that the header controls go to a second row */
 @media (max-width: 1300px) {
-  body { grid-template-rows: auto 1fr 30px; }
+  body { grid-template-rows: auto 1fr; }
   .topbar { flex-wrap: wrap; row-gap: 0; padding: 0 16px; }
   .view-tabs { min-height: 48px; }
   .runtime-controls { margin-left: auto; padding-bottom: 8px; }
@@ -323,7 +322,7 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
 
 /* Narrow screens */
 @media (max-width: 1100px) {
-  body { grid-template-rows: auto auto auto; overflow: auto; }
+  body { grid-template-rows: auto auto; overflow: auto; }
   .topbar { flex-wrap: wrap; gap: 10px; padding: 10px 16px; }
   .view-tabs { align-self: auto; }
   .view-tab { padding: 8px 12px; }
@@ -333,5 +332,4 @@ body.resizing, body.resizing * { cursor: row-resize !important; user-select: non
   .panels, .metric-charts, .statistics-panels { grid-template-columns: 1fr; }
   .image-frame { min-height: 320px; }
   .knowledge-list { max-height: 420px; }
-  footer { padding: 8px 16px; }
 }

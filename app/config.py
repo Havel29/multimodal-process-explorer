@@ -106,7 +106,6 @@ class DemoConfig:
     subtitle: str
     institution: str
     logo: str
-    disclaimer: str
     image_noun: str
     stage_noun: str
     case_noun: str
@@ -288,7 +287,6 @@ def config_from_mapping(raw: dict) -> DemoConfig:
         subtitle=demo.get("subtitle", "Process Explorer"),
         institution=demo.get("institution", ""),
         logo=demo.get("logo", ""),
-        disclaimer=demo.get("disclaimer", ""),
         image_noun=demo.get("image_noun", "image"),
         stage_noun=demo.get("stage_noun", "image"),
         case_noun=demo.get("case_noun", "case"),

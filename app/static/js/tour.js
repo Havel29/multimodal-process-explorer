@@ -11,7 +11,7 @@ const GAP = 12;
 // Steps whose element is missing or hidden (e.g. no Statistics without labels) are skipped.
 const STEPS = [
   { target: ".view-tabs", title: "Three pages",
-    text: "Case view explores one case at a time, Statistics summarises every case, and Inputs loads another event log, images and models." },
+    text: "Inputs loads another event log, images and models, Case view explores one case at a time, and Statistics summarises every case." },
   { target: ".patient-picker", title: "Pick a case",
     text: "Choose a case from the list, or step through them with the arrows." },
   { target: "#swimlanes .lane-scroll", title: "The timeline",

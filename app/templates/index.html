@@ -28,9 +28,9 @@
       <strong>{{ config.title }}</strong><span>{{ config.subtitle }}</span>
     </a>
     <nav class="view-tabs" aria-label="Views">
+      <button id="inputsTab" class="view-tab" type="button">Inputs</button>
       <button id="caseTab" class="view-tab" type="button">Case view</button>
       <button id="statisticsTab" class="view-tab{% if not config.labels_available %} hidden{% endif %}" type="button">{{ public_config.texts.statistics_title }}</button>
-      <button id="inputsTab" class="view-tab" type="button">Inputs</button>
     </nav>
     <nav class="patient-picker hidden" aria-label="Case navigation">
       <button id="previousPatient" type="button" aria-label="Previous case" title="Previous case">&#8249;</button>
@@ -179,7 +179,6 @@
     <div id="statisticsTable" class="statistics-table"></div>
   </main>
 
-  <footer>{{ config.disclaimer }}</footer>
   <div id="toast" class="toast hidden" role="alert"></div>
 </body>
 </html>

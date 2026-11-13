@@ -169,7 +169,6 @@ def test_page_is_rendered_from_the_configuration(client, config):
     for model in config.models:
         assert f'data-model="{model.id}"' in page
         assert f"--model-{model.id}: {model.color}" in page
-    assert config.disclaimer in page
 
 
 def test_prediction_records_exportable_performance_metrics(client):

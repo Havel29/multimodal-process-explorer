@@ -34,7 +34,7 @@ def dump_config(config: DemoConfig, header: str = "") -> str:
     lines += _table("demo", {
         "title": config.title, "subtitle": config.subtitle, "institution": config.institution, "logo": config.logo,
         "case_noun": config.case_noun, "pathway_noun": config.pathway_noun, "image_noun": config.image_noun,
-        "stage_noun": config.stage_noun, "day_noun": config.day_noun, "disclaimer": config.disclaimer,
+        "stage_noun": config.stage_noun, "day_noun": config.day_noun,
     })
     # model_cache is left out: it often comes from HF_HOME, which belongs to the machine, not the dataset
     lines += [""] + _table("data", {"grayscale_images": config.grayscale_images})
