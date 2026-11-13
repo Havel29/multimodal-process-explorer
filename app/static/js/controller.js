@@ -97,13 +97,15 @@ export async function showStatistics() {
   await statistics.show();
 }
 
-/** Show another class: the charts and statistics are drawn again, a running explanation is dropped. */
+/** Another target class: the charts and statistics are drawn again, a running explanation is dropped
+ * and the predictions of the open case run again. */
 export function showClass(code) {
   if (!setShownClass(code)) return;
   analysis.clear();
   if (state.patient) {
     renderAll();
     header.renderInsights();
+    if (state.view === "patient" && state.cutoff) runPrediction();
   }
   if (state.view === "statistics") statistics.rerender();
 }

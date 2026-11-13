@@ -149,7 +149,7 @@ The tabs at the top open the **Case view**, the **Statistics** page and the
   the latest image appear at once; the prediction lines follow in the
   background.
 - **Timeline:** one lane per event type. Images are the `IMG` markers. Below the
-  lanes, a chart shows how the probability of the **class shown** changes over
+  lanes, a chart shows how the probability of the **target class** changes over
   time for each model. Drag the bar under the timeline down for a taller chart,
   or up for more room below (double-click resets it).
 - **Zoom:** when events crowd together, zoom in with **+** (or Ctrl + scroll on
@@ -178,10 +178,11 @@ The tabs at the top open the **Case view**, the **Statistics** page and the
   the predictions. A case is included once its prediction lines are computed:
   the cases you opened already are, and **Compute missing cases** does the
   rest. Results are kept until **Reset statistics**.
-- **Class shown:** the class whose probability the prediction lines, the
+- **Target class:** the class whose probability the prediction lines, the
   statistics (ROC AUC, Brier score, event importance) and the explanations
-  show. It starts at the risk class of the configuration (the rarest unless
-  set) and the browser remembers your choice.
+  show; changing it runs the predictions again. It starts at the risk class
+  of the configuration (the rarest unless set) and the browser remembers
+  your choice.
 - **Inference:** switch between Auto, CPU and GPU.
 - **Download CSV:** what the page shows, as one table. In the Case view: each
   model's prediction at the cutoff (class probabilities, device and inference
@@ -189,7 +190,7 @@ The tabs at the top open the **Case view**, the **Statistics** page and the
   explanation. In Statistics: the prediction lines and the event-type
   importance of every computed case. There is a `p_<class>` column per class,
   and for the importance a `delta_<class>` column per class (`score` is the
-  class shown). Each column belongs to some kinds of rows only (device and
+  target class). Each column belongs to some kinds of rows only (device and
   inference time to predictions, event and score to explanations and
   importance), so the other rows leave it empty.
 
@@ -209,12 +210,12 @@ During setup, the explorer reads the following from the event log:
 | --- | --- |
 | Timeline lanes | One per activity. |
 | Image events | The activities whose events have a value in the image field. |
-| Outcome classes | The values of the label field, two or more. The rarest one is the risk class, unless `risk_class` in `[outcome]` names another; the page can show any class (**Class shown**). |
+| Outcome classes | The values of the label field, two or more. The rarest one is the risk class, unless `risk_class` in `[outcome]` names another; the page can show any class (**Target class**). |
 | Event texts | The activity and all event attributes, except the label. |
 
 A model's prediction is its most probable class; accuracy, settling, flips and
 agreement are based on it. The prediction lines, ROC AUC, Brier score, event
-importance and explanation colours follow the class shown against all the
+importance and explanation colours follow the target class against all the
 others, so they read the same with two or more classes. Prediction lines
 computed before an update that keeps every class work for two classes; with
 more, **Reset statistics** computes them again.

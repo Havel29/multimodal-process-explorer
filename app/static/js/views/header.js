@@ -44,7 +44,7 @@ export function init() {
 /** The class selector: every outcome class, starting at the one shown (the risk class by default). */
 function fillClasses() {
   els.classSelect.innerHTML = config.outcomes.map((outcome) =>
-    `<option value="${escapeHtml(outcome.code)}">${escapeHtml(outcome.label)}</option>`).join("");
+    `<option value="${escapeHtml(outcome.code)}" title="${escapeHtml(outcome.label)}">${escapeHtml(outcome.short || outcome.label)}</option>`).join("");
   els.classSelect.value = riskOutcome.code;
   els.classControl.classList.toggle("hidden", config.outcomes.length < 2);
 }

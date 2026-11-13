@@ -5,6 +5,7 @@
 [demo]
 title = "Multimodal"
 subtitle = "Process Explorer"
+logo = "multimodal-explorer.svg"
 case_noun = "patient"
 pathway_noun = "pathway"
 image_noun = "radiograph"

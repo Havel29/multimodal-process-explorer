@@ -13,6 +13,7 @@
 [demo]
 title = "Multimodal"
 subtitle = "Process Explorer"
+logo = "multimodal-explorer.svg"
 disclaimer = ""
 
 # [outcome]

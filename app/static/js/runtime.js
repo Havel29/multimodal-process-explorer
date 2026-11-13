@@ -10,7 +10,9 @@ export async function init() {
   selector.value = runtime.preference;
   const gpu = selector.querySelector('option[value="gpu"]');
   gpu.disabled = !runtime.gpu_available;
-  gpu.textContent = runtime.gpu_available ? `GPU (${runtime.gpu_name})` : "GPU (unavailable)";
+  // The GPU name goes in the tooltip: a long name would widen the header
+  gpu.textContent = runtime.gpu_available ? "GPU" : "GPU (unavailable)";
+  if (runtime.gpu_available) selector.title = `GPU: ${runtime.gpu_name}`;
 
   selector.addEventListener("change", async () => {
     const previous = runtime.preference;
