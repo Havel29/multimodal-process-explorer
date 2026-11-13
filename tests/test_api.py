@@ -256,3 +256,16 @@ def test_more_than_two_outcome_classes(config):
     result = client.post("/api/explain", json=EXPLAIN_AT_XRAY).json()
     assert result["prediction"]["code"] == "transfer"
     assert service.models["flava"].targets[0] == 0  # the risk class is explained, not the predicted one
+
+
+def test_everything_but_the_explanation_works_without_one(client, service):
+    import dataclasses
+
+    service.config = dataclasses.replace(service.config, explanations=())
+    page = TestClient(create_app(service=service)).get("/").text
+
+    assert 'class="analysis hidden"' in page and "data-explain=" not in page
+    assert predict(client, cutoff_day=1, enabled_event_ids=["E001"]).status_code == 200
+    assert client.get("/api/patients/Patient 01/trajectory?compute=true").status_code == 200
+    assert client.get("/api/patients/Patient 01/importance?compute=true").status_code == 200
+    assert client.post("/api/explain", json=EXPLAIN_AT_XRAY).status_code == 400

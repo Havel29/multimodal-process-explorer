@@ -59,23 +59,32 @@ function stopComputing() {
   els.computeMissing.textContent = "Compute missing cases";
 }
 
+/**
+ * Two passes, so the counters match what is on screen: first the risk curves (the charts),
+ * then what drives the predictions. Each counts on from the cases that already have that part.
+ */
 async function computeMissing() {
-  const missing = JSON.parse(els.computeMissing.dataset.missing || "[]");
-  // Count from the cases already complete, so the label shows overall progress
-  const total = Number(els.computeMissing.dataset.total) || missing.length;
-  const complete = total - missing.length;
   const run = ++computeRun;
   els.computeMissing.disabled = true;
   try {
-    for (const [index, patientId] of missing.entries()) {
-      els.computeMissing.textContent = `Computing ${complete + index + 1} of ${total}`;
-      await api.trajectory(patientId, true);
-      if (run !== computeRun) return;
-      await api.importance(patientId, true);
-      if (run !== computeRun) return;
-      const { patients } = await api.statistics();
-      if (run !== computeRun) return;
-      if (state.view === "statistics") render(patients);
+    const { patients } = await api.statistics();
+    const total = patients.length;
+    const passes = [
+      { label: "curves", has: (patient) => patient.points, compute: (id) => api.trajectory(id, true) },
+      { label: "drivers", has: (patient) => patient.importance, compute: (id) => api.importance(id, true) },
+    ];
+    for (const pass of passes) {
+      const missing = patients.filter((patient) => !pass.has(patient)).map((patient) => patient.id);
+      const done = total - missing.length;
+      for (const [index, patientId] of missing.entries()) {
+        if (run !== computeRun) return;
+        els.computeMissing.textContent = `Computing ${pass.label} ${done + index + 1} of ${total}`;
+        await pass.compute(patientId);
+        if (run !== computeRun) return;
+        const latest = await api.statistics();
+        if (run !== computeRun) return;
+        if (state.view === "statistics") render(latest.patients);
+      }
     }
   } catch (error) {
     if (run === computeRun) showToast(error.message);
@@ -140,8 +149,6 @@ function render(rawPatients) {
   const missing = patients.filter((patient) => !patient.points || !patient.importance).map((patient) => patient.id);
   els.computeMissing.classList.toggle("hidden", !missing.length);
   els.reset.classList.toggle("hidden", !patients.some((patient) => patient.points || patient.importance));
-  els.computeMissing.dataset.missing = JSON.stringify(missing);
-  els.computeMissing.dataset.total = String(patients.length);
 }
 
 function byDay(patients, metric, dayGrid) {
