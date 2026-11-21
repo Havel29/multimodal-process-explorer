@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Multimodal Process Explorer</title>
+  <defs>
+    <linearGradient id="background" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#183a57"/>
+      <stop offset="1" stop-color="#0d2235"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#background)"/>
+  <!-- the handle of the magnifying glass -->
+  <path d="M38.5 38.5 51 51" stroke="#dbe7f0" stroke-width="7" stroke-linecap="round"/>
+  <!-- the lens, over a small process: three events of different kinds joined in order -->
+  <circle cx="27" cy="27" r="16" fill="#ffffff" fill-opacity=".1" stroke="#dbe7f0" stroke-width="4"/>
+  <path d="M18 33 27 20 36 30" fill="none" stroke="#8da6ba" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="18" cy="33" r="4.5" fill="#eda100" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="27" cy="20" r="4.5" fill="#6250d6" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="36" cy="30" r="4.5" fill="#1baf7a" stroke="#fff" stroke-width="1.5"/>
+</svg>

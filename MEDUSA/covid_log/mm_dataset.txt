@@ -1,0 +1,1 @@
+Extract Labeled Image–Text Pairs

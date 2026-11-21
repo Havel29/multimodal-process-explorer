@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+.venv-*/
+.pytest_cache/
+.ruff_cache/
+hf-cache/
+
+# Local data, e.g. restricted CDSL files (never commit): only the README and an empty folder are tracked
+data/*
+!data/README.md
+!data/curated/
+data/curated/*
+!data/curated/.gitkeep
+
+# Checkpoints (the open example's are in the GitHub release; the CDSL ones are restricted)
+models/
+*.pth
+
+# Paper sources (kept on Overleaf, not published)
+latex/

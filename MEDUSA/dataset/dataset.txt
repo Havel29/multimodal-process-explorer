@@ -1,0 +1,9 @@
+Download the following files:
+
+atc5.csv                       diagnosis_hosp_03.csv      patient_01.csv
+atc7.csv                       vital_signs_04.csv
+CDSL-1.0.0-dicom-metadata.csv  icd10_codes_dict.txt       
+diagnosis_er_02.csv            lab_06.csv
+medication_05.csv
+
+and copy them into the "dataset" folder.
